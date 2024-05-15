@@ -14,12 +14,12 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'notification_type',
+    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PRIMARY",
+        name: "PK__notifica__718E5494D2957EA7",
         unique: true,
-        using: "BTREE",
         fields: [
           { name: "ntid" },
         ]

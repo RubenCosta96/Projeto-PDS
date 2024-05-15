@@ -148,6 +148,7 @@ exports.editSupportTicket = async (req, res) =>{
 	}
 };
 
+//falta alterar o estado do ticket 
 exports.assignmentPriorityEstimatedDeadline = async (req, res) => {
 	try {
 		let id = req.params.id;
@@ -180,6 +181,7 @@ exports.assignmentPriorityEstimatedDeadline = async (req, res) => {
 
 		support_ticket.priority = priority;
 		support_ticket.deadline = deadline;
+		//alterar o estado do ticket 
 		await support_ticket.save();
 
 		let response = {
@@ -227,6 +229,7 @@ exports.removeSupportTicket = async (req, res) => {
 	}
 };
 
+//verificar codigo
 exports.concludeSupportTicket = async (req, res) => {
 	try {
 		let id = req.params.id;
@@ -252,7 +255,9 @@ exports.concludeSupportTicket = async (req, res) => {
 			return res.status(409).send({ success: 0, message: "Ticket já finalizado" });
 		}
 
+		//verificar o estado a atribuir e como enviar a notificaçao 
 		support_ticket.support_statesssid = 3;
+
 		await support_ticket.save();
 
 		let response = {
@@ -266,6 +271,7 @@ exports.concludeSupportTicket = async (req, res) => {
 	}
 };
 
+//Ver funçao
 exports.approveSupportTicket = async (req, res) => {
     try {
         let id = req.params.id;
@@ -290,6 +296,7 @@ exports.approveSupportTicket = async (req, res) => {
         }
 
         support_ticket.support_statesssid = 2;
+		//Ver o porque de ser admin e nao manager, e enviar notificaçao de analise de ticket
 		support_ticket.admin_useruid = idUserToken;
 		await support_ticket.save();
 
@@ -354,7 +361,7 @@ exports.informMissingData = async (req, res) =>{
 		let idUserToken = req.user.id;
 
 		let support_ticket = await db.support_ticket.findByPk(id);
-
+ 
 		if (!support_ticket) {
 			return res.status(404).send({ success: 0, message: "Pedido de suporte inexistente" });
 		}
@@ -388,5 +395,49 @@ exports.informMissingData = async (req, res) =>{
 	}
 };
 
+//
+exports.getSupportTicketsBySuportState = async (req, res) => {
+	try {
+		let state = req.params.id;
+		let idUserToken = req.user.id;
+		let tickets;
 
+		let result = await db.support_state.findByPk(state);
 
+		if(!result){
+			return res.status(404).send({ success: 0, message: "Não existe esse estado de pedido de suporte" });
+		}
+
+		let isManager = await utils.isManager(idUserToken);
+		if(isManager){
+			let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken }});
+			tickets = await db.support_ticket.findAll({ where: { museummid: manager.museummid, support_statesssid: state}});
+		}else{
+			tickets = await db.support_ticket.findAll({ where: { useruid: idUserToken, support_statesssid: state}});
+		} 
+
+		if (tickets.length === 0)
+			return res.status(404).send({ success: 0, message: "Não existem pedidos de suporte" });
+
+		let response = {
+			success: 1,
+			length: tickets.length,
+			results: tickets.map((support_ticket) => {
+				return {
+					id: support_ticket.stid,
+					description: support_ticket.Description,
+					statessid: support_ticket.support_statesssid,
+					museumid: support_ticket.museummid,
+					userid: support_ticket.useruid,
+					priority: support_ticket.priority,
+					responsible: support_ticket.admin_useruid,
+					deadline: support_ticket.deadline,
+				};
+			}),
+		};
+
+		return res.status(200).send(response);
+	} catch (err) {
+		return res.status(500).send({ error: err, message: err.message });
+	}
+};

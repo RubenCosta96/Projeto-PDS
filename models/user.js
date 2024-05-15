@@ -38,28 +38,14 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'user',
+    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PRIMARY",
+        name: "PK__user__DD70126495A350C7",
         unique: true,
-        using: "BTREE",
         fields: [
           { name: "uid" },
-        ]
-      },
-      {
-        name: "FKuser33915",
-        using: "BTREE",
-        fields: [
-          { name: "user_typeutid" },
-        ]
-      },
-      {
-        name: "FKuser470631",
-        using: "BTREE",
-        fields: [
-          { name: "user_statusus_id" },
         ]
       },
     ]

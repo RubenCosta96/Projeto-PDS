@@ -18,25 +18,26 @@ module.exports = function(sequelize, DataTypes) {
         model: 'user',
         key: 'uid'
       }
+    },
+    Invoice_statusinvoicestatusid: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Invoice_status',
+        key: 'invoicestatusid'
+      }
     }
   }, {
     sequelize,
     tableName: 'sale_invoice',
+    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PRIMARY",
+        name: "PK__sale_inv__F67992D063CE5C46",
         unique: true,
-        using: "BTREE",
         fields: [
           { name: "sale_invoiceid" },
-        ]
-      },
-      {
-        name: "FKsale_invoi153001",
-        using: "BTREE",
-        fields: [
-          { name: "useruid" },
         ]
       },
     ]

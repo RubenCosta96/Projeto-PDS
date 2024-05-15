@@ -20,14 +20,14 @@ exports.isAdmin = async (id) => {
 };
 
 exports.isManager = async (id) => {
-  try {
-    const user = await db.user.findByPk(id, { include: UserType });
+	try {
+		const userMuseum = await db.usermuseum.findOne({ where: { useruid: id }});
 
-    if (!user || !user.UserType || user.UserType.ut_description !== "manager") return 0;
+		if (!userMuseum) return 0;
 
-    return 1;
-  } catch (err) {
-    console.error("Error checking manager status:", err);
-    return 0;
-  }
+		return 1;
+	} catch (err) {
+		console.error("Error checking manager:", err);
+		return 0;
+	}
 };

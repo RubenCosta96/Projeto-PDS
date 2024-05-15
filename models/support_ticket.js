@@ -54,42 +54,14 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'support_ticket',
+    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PRIMARY",
+        name: "PK__support___312D1FC7CBF6B78A",
         unique: true,
-        using: "BTREE",
         fields: [
           { name: "stid" },
-        ]
-      },
-      {
-        name: "FKsupport_ti689656",
-        using: "BTREE",
-        fields: [
-          { name: "support_statesssid" },
-        ]
-      },
-      {
-        name: "FKsupport_ti993949",
-        using: "BTREE",
-        fields: [
-          { name: "museummid" },
-        ]
-      },
-      {
-        name: "FKsupport_ti303040",
-        using: "BTREE",
-        fields: [
-          { name: "useruid" },
-        ]
-      },
-      {
-        name: "FKsupport_ti140257",
-        using: "BTREE",
-        fields: [
-          { name: "admin_useruid" },
         ]
       },
     ]

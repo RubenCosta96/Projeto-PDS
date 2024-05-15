@@ -30,28 +30,14 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'sale_line',
+    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PRIMARY",
+        name: "PK__sale_lin__3059D05DB8951659",
         unique: true,
-        using: "BTREE",
         fields: [
           { name: "sale_lid" },
-        ]
-      },
-      {
-        name: "FKsale_line683962",
-        using: "BTREE",
-        fields: [
-          { name: "sale_invoicesale_invoiceid" },
-        ]
-      },
-      {
-        name: "FKsale_line171151",
-        using: "BTREE",
-        fields: [
-          { name: "productprodid" },
         ]
       },
     ]
