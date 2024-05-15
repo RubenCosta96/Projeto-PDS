@@ -18,7 +18,7 @@ module.exports = function(sequelize, DataTypes) {
     timestamps: false,
     indexes: [
       {
-        name: "PK__ad_state__E9529D23F19C1235",
+        name: "PK__ad_state__E9529D2342EB0FD7",
         unique: true,
         fields: [
           { name: "adstid" },
