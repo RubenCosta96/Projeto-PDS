@@ -5,15 +5,15 @@ const ZipCodeController = require("../controllers/zip_codes");
 const login = require("../middleware/login");
 
 // list All evaluations
-router.get("/ZipCode", ZipCodeController.getAllZipCodes);
+router.get("/zipCode", ZipCodeController.getAllZipCodes);
 
 // list certain evaluation
-router.get("/ZipCode/:id", ZipCodeController.getZipCode);
+router.get("/zipCode/:id", ZipCodeController.getZipCode);
 
 // Add evaluations
-router.post("/ZipCode/add", login.required, ZipCodeController.addZipCode);
+router.post("/zipCode/add", login.required, ZipCodeController.addZipCode);
 
 // Remove evaluation
-router.delete("/ZipCode/remove", login.required, ZipCodeController.removeZipCode);
+router.delete("/zipCode/remove", login.required, ZipCodeController.removeZipCode);
  
 module.exports = router;

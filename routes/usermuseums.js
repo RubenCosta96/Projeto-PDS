@@ -5,15 +5,15 @@ const UserMuseumController = require("../controllers/usermuseums");
 const login = require("../middleware/login");
 
 // list All evaluations
-router.get("/UserMuseum", UserMuseumController.getAllUserMuseum);
+router.get("/userMuseum", UserMuseumController.getAllUserMuseum);
 
 // list certain evaluation
-router.get("/UserMuseum/specific", UserMuseumController.getUserMuseum);
+router.get("/userMuseum/specific", UserMuseumController.getUserMuseum);
 
 // Add evaluations
-router.post("/UserMuseum/add", login.required, UserMuseumController.addUserMuseum);
+router.post("/userMuseum/add", login.required, UserMuseumController.addUserMuseum);
 
 // Remove evaluation
-router.delete("/UserMuseum/remove", login.required, UserMuseumController.removeUserMuseum);
+router.delete("/userMuseum/remove", login.required, UserMuseumController.removeUserMuseum);
  
 module.exports = router;

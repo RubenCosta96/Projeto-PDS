@@ -243,7 +243,7 @@ exports.tokenVerify = async (req, res) => {
 			return res.status(401).send({ success: 0, error: err, message: err.message });
 		}
 
-		let id = decode.uid;
+		let id = decode.id;
 
 		let user = await db.user.findByPk(id);
 		if (!user) return res.status(404).send({ success: 0, message: 'Utilizador inexistente' });
