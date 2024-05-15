@@ -63,6 +63,34 @@ exports.getEvent = async (req, res) => {
   }
 };
 
+exports.getEventByMuseum = async (req, res) => {
+  try {
+    let id = req.params.id;
+
+    let event = await db.event.findAll({ where: { museummid : id } });
+
+    if (event.length === 0) return res.status(404).send({ success: 0, message: "Não existem eventos para este museu." });
+
+    let response = {
+      success: 1,
+      length: 1,
+      results: [
+        {
+          id: event.eid,
+          start_date: event.event_start_date,
+          end_date: event.event_end_date,
+          type: event.event_typeeid,
+          museum: event.museummid,
+          status: event.event_statuses_id,
+        },
+      ],
+    };
+
+    return res.status(200).send(response);
+  } catch (err) {
+    return res.status(500).send({ error: err, message: err.message });
+  }
+};
 
 exports.addEvent = async (req, res) => {
   try {

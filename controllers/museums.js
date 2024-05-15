@@ -63,8 +63,8 @@ exports.getMuseumsByName = async (req, res) => {
 
 		let museums = await db.museum.findAll({ where: { museum_name: name } });
 
-		if (!museums) {
-			return res.status(404).send({ success: 0, message: "Museu inexistente" });
+		if (museums.length === 0) {
+			return res.status(404).send({ success: 0, message: "Não existem museus com este nome." });
 		}
 
 		let response = {

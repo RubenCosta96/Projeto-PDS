@@ -12,6 +12,8 @@ const utils = require("../utils");
 router.get("/events", eventsController.getEvents);
 // List specific collection
 router.get("/events/:id", eventsController.getEvent);
+// List all events by museum
+router.get("/events/museum/:id", eventsController.getEventsByMuseum);
 // Add collection
 router.post("/events/add", login.required, eventsController.addEvent);
 // Edit collection
