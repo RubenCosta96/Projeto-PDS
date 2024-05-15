@@ -1,25 +1,25 @@
 const db = require('../config/mysql');
 const utils = require("../utils/index");
 
-exports.getAllSupportStates = async (req, res) =>{
+exports.getAllProposalStates = async (req, res) =>{
     try{
         let idUserToken = req.user.id;
 
         let isAdmin = await utils.isAdmin(idUserToken);
 		if (!isAdmin) return res.status(403).send({ success: 0, message: 'Sem permissão' });
 
-        let states = await db.support_state.findAll();
+        let states = await db.proposal_state.findAll();
 
         if (states.length === 0)
-			return res.status(404).send({ success: 0, message: "Não existem estados de suporte" });
+			return res.status(404).send({ success: 0, message: "Não existem estados de proposta" });
 
         let response = {
 			success: 1,
 			length: states.length,
-			results: states.map((support_state) => {
+			results: states.map((proposal_state) => {
 				return {
-                    id: support_state.ssid,
-                    description: support_state.description,
+                    id: proposal_state.psid,
+                    description: proposal_state.description,
 				};
 			}),
 		};
@@ -30,7 +30,7 @@ exports.getAllSupportStates = async (req, res) =>{
 	}
 };
 
-exports.getSupportState = async (req, res) =>{
+exports.getProposalState = async (req, res) =>{
     try{
         let idUserToken = req.user.id;
         let id = req.params.id;
@@ -38,7 +38,7 @@ exports.getSupportState = async (req, res) =>{
         let isAdmin = await utils.isAdmin(idUserToken);
 		if (!isAdmin) return res.status(403).send({ success: 0, message: 'Sem permissão' });
 
-        let state = await db.support_state.findByPk(id);
+        let state = await db.proposal_state.findByPk(id);
 
         if (!state)
 			return res.status(404).send({ success: 0, message: "Estado inexistente" });
@@ -48,8 +48,8 @@ exports.getSupportState = async (req, res) =>{
             length: 1,
             results: [
                 {
-                    id: support_state.ssid,
-                    description: support_state.description,
+                    id: state.psid,
+                    description: state.description,
                 },
             ],
         };
@@ -60,21 +60,21 @@ exports.getSupportState = async (req, res) =>{
 	}
 };
 
-exports.addSupportState = async (req, res) =>{
+exports.addProposalStates = async (req, res) =>{
     try{
         let idUserToken = req.user.id;
-        let ss_description = req.body.description;
+        let description = req.body.description;
 
         let isAdmin = await utils.isAdmin(idUserToken);
 		if (!isAdmin) return res.status(403).send({ success: 0, message: 'Sem permissão' });
 
-        let new_Support_state = await db.support_state.create({
-            description: ss_description,
+        let new_Proposal_state = await db.proposal_state.create({
+            description: description,
 		});
 	
 		let response = {
 			success: 1,
-			message: "Estado de suporte adicionado com sucesso",
+			message: "Estado de proposta adicionado com sucesso",
 		};
 
         return res.status(200).send(response);
@@ -83,7 +83,7 @@ exports.addSupportState = async (req, res) =>{
 	}
 };
 
-exports.removeSupportState = async (req, res) =>{
+exports.removeProposalStates = async (req, res) =>{
     try{
         let idUserToken = req.user.id;
         let id = req.params.id;
@@ -91,7 +91,7 @@ exports.removeSupportState = async (req, res) =>{
         let isAdmin = await utils.isAdmin(idUserToken);
 		if (!isAdmin) return res.status(403).send({ success: 0, message: 'Sem permissão' });
 
-        let state = await db.support_state.findByPk(id);
+        let state = await db.proposal_state.findByPk(id);
 
         if (!state) {
 			return res.status(404).send({ success: 0, message: "Estado inexistente" });
@@ -101,7 +101,7 @@ exports.removeSupportState = async (req, res) =>{
 
 		let response = {
 			success: 1,
-			message: "Estado removido com sucesso",
+			message: "Proposta de estado removida com sucesso",
 		};
 
         return res.status(200).send(response);
@@ -110,7 +110,7 @@ exports.removeSupportState = async (req, res) =>{
 	}
 };
 
-exports.editSupportState = async (req, res) =>{
+exports.editProposalStates = async (req, res) =>{
     try{
         let id = req.params.id;
 		let idUserToken = req.user.id;
@@ -119,7 +119,7 @@ exports.editSupportState = async (req, res) =>{
         let isAdmin = await utils.isAdmin(idUserToken);
 		if (!isAdmin) return res.status(403).send({ success: 0, message: 'Sem permissão' });
 
-        let state = await db.support_state.findByPk(id);
+        let state = await db.proposal_state.findByPk(id);
         if (!state) {
 			return res.status(404).send({ success: 0, message: "Estado inexistente" });
 		}
@@ -130,7 +130,7 @@ exports.editSupportState = async (req, res) =>{
 
 		let response = {
 			success: 1,
-			message: "Estado editado com sucesso",
+			message: "Proposta de estado removida com sucesso",
 		};
 
         return res.status(200).send(response);

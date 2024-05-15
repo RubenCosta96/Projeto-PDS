@@ -3,40 +3,50 @@ const router = express.Router();
 
 const support_ticket_controller = require("../controllers/support_tickets");
 const supportTicketEvaluationController = require("../controllers/support_evaluations");
+const supportTicketStateController = require("../controllers/support_states");
 const login = require("../middleware/login");
 
 //List all support tickets
 router.get("/supportTickets", login.required, support_ticket_controller.getSupportTickets);
 //List specific support ticket
 router.get("/supportTickets/:id", login.required, support_ticket_controller.getSupportTicket);
-//List specific support ticket
-router.get("/supportTickets/SupportState/:id", login.required, support_ticket_controller.getSupportTicketsBySuportState);
 //Add support ticket
 router.post("/supportTickets/add", login.required, support_ticket_controller.addSupportTicket);
 //Edit support ticket
-router.put('/supportTicket/edit/:id', login.required, support_ticket_controller.editSupportTicket);
+router.put('/supportTickets/edit/:id', login.required, support_ticket_controller.editSupportTicket);
 //Assignment priority and Estimated deadline
-router.put("/supportTicket/assignmentPriorityDeadline/:id", login.required, support_ticket_controller.assignmentPriorityEstimatedDeadline);
+router.put("/supportTickets/assignmentPriorityDeadline/:id", login.required, support_ticket_controller.assignmentPriorityEstimatedDeadline);
 //Remove support ticket
-router.delete("/support_tickets/remove/:id", login.required, support_ticket_controller.removeSupportTicket);
+router.delete("/supportTickets/remove/:id", login.required, support_ticket_controller.removeSupportTicket);
 //Conclude support ticket
-router.put("/support_ticket/conclude/:id", login.required, support_ticket_controller.concludeSupportTicket);
+router.put("/supportTickets/conclude/:id", login.required, support_ticket_controller.concludeSupportTicket);
 //Approve support ticket
-router.put("/support_ticket/approve/:id", login.required, support_ticket_controller.approveSupportTicket);
+router.put("/supportTickets/approve/:id", login.required, support_ticket_controller.approveSupportTicket);
 //Send notifications
-router.post('/supportTicket/sendNotifications/:id', login.required, support_ticket_controller.sendNotifications);
+router.post('/supportTickets/sendNotifications/:id', login.required, support_ticket_controller.sendNotifications);
 //Inform missing data
-router.post('/supportTicket/informMissingData/:id', login.required, support_ticket_controller.informMissingData);
+router.post('/supportTickets/informMissingData/:id', login.required, support_ticket_controller.informMissingData);
 
 //List all support evaluations
-router.get("/supportTicket/evaluations", login.required, supportTicketEvaluationController.getAllSupportEvaluations);
+router.get("/supportTickets/evaluations", login.required, supportTicketEvaluationController.getAllSupportEvaluations);
 //List sprecific support evaluations
-router.get("/supportTicket/evaluations/:id", login.required, supportTicketEvaluationController.getSupportEvaluations);
+router.get("/supportTickets/evaluations/:id", login.required, supportTicketEvaluationController.getSupportEvaluations);
 //Add support evaluations
-router.post("/supportTicket/evaluations/add", login.required, supportTicketEvaluationController.addSupportEvaluation);
+router.post("/supportTickets/evaluations/add", login.required, supportTicketEvaluationController.addSupportEvaluation);
 //Remove support evaluations
-router.delete("/supportTicket/evaluations/remove/:id", login.required, supportTicketEvaluationController.removeSupportEvaluation);
+router.delete("/supportTickets/evaluations/remove/:id", login.required, supportTicketEvaluationController.removeSupportEvaluation);
 //Edit support evaluations
-router.put("/supportTicket/evaluations/edit/:id", login.required, supportTicketEvaluationController.editSupportEvaluation);
+router.put("/supportTickets/evaluations/edit/:id", login.required, supportTicketEvaluationController.editSupportEvaluation);
+
+//List all support state
+router.get("/supportTickets/states", login.required, supportTicketStateController.getAllSupportStates);
+//List specific support state
+router.get("/supportTickets/states/:id", login.required, supportTicketStateController.getSupportState);
+//Add support state
+router.post("/supportTickets/states/add", login.required, supportTicketStateController.addSupportState);
+//Remove support state
+router.delete("/supportTickets/states/remove/:id", login.required, supportTicketStateController.removeSupportState);
+//Edit support state
+router.get("/supportTickets/states/edit/:id", login.required, supportTicketStateController.editSupportState);
 
 module.exports = router;
