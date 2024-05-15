@@ -63,7 +63,7 @@ exports.getEvent = async (req, res) => {
   }
 };
 
-exports.getEventByMuseum = async (req, res) => {
+exports.getEventsByMuseum = async (req, res) => {
   try {
     let id = req.params.id;
 

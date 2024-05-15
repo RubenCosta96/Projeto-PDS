@@ -17,6 +17,7 @@ exports.getAllSales = async (req, res) => {
             id: sale_invoice.sale_invoiceid,
             date: sale_invoice.invoice_departure_date,
             user_id: sale_invoice.useruid,
+            invoiceStatus: sale_invoice.Invoice_statusinvoicestatusid,
           };
         }),
       };
@@ -47,6 +48,7 @@ exports.getSalesByUser = async (req, res) => {
                 id: sale_invoice.sale_invoiceid,
                 date: sale_invoice.invoice_departure_date,
                 user_id: sale_invoice.useruid,
+                invoiceStatus: sale_invoice.Invoice_statusinvoicestatusid,
             };
             }),
         };
@@ -54,7 +56,43 @@ exports.getSalesByUser = async (req, res) => {
         } catch (err) {
         return res.status(500).send({ error: err, message: err.message });
         }
-    };
+};
+
+exports.getSalesByInvoiceStatus = async (req, res) => {
+  try {
+      let id = req.params.id;
+      let status = await db.Invoice_status.findByPk(id);
+
+      if(!status){
+        return res.status(404).send({ success: 0, message: "O estado de faturaçao é invalido" });
+      }
+
+      let sales = await db.sale_invoice.findAll({
+          where:{
+            Invoice_statusinvoicestatusid: id,
+          },
+      });
+
+      if (sales.length === 0)
+          return res.status(404).send({ success: 0, message: "Não existem vendas registadas relativas e esse estado de faturação" });
+
+      let response = {
+          success: 1,
+          length: sales.length,
+          results: sales.map((sale_invoice) => {
+          return {
+              id: sale_invoice.sale_invoiceid,
+              date: sale_invoice.invoice_departure_date,
+              user_id: sale_invoice.useruid,
+              invoiceStatus: sale_invoice.Invoice_statusinvoicestatusid,
+          };
+          }),
+      };
+      return res.status(200).send(response);
+      } catch (err) {
+      return res.status(500).send({ error: err, message: err.message });
+      }
+};
 
 
 exports.getSale = async (req, res) => {
@@ -74,6 +112,7 @@ exports.getSale = async (req, res) => {
         id: result.sale_invoiceid,
         date: result.invoice_departure_date,
         user_id: result.useruid,
+        invoiceStatus: result.Invoice_statusinvoicestatusid,
       },
     };
 
@@ -87,17 +126,17 @@ exports.addSale = async (req, res) => {
   try {
     let date = req.body.date;
     let userid = req.body.user_id;
-    let idOwner = req.body.id;
+    let invoiceStatus = req.body.invoice_status;
     let idUserToken = req.user.id;
 
     let isManager = await utils.isManager(idUserToken);
     let isAdmin = await utils.isAdmin(idUserToken);
 
-    if (!isManager && idOwner != idUserToken && isAdmin) {
+    if (!isManager && !isAdmin) {
       return res.status(403).send({ success: 0, message: "Sem permissão" });
     }
 
-    let user = await db.user.findByPk(idOwner);
+    let user = await db.user.findByPk(idUserToken);
     if (!user) {
       return res
         .status(404)
@@ -109,6 +148,7 @@ exports.addSale = async (req, res) => {
     let newSaleInvoice = await db.sale_invoice.create({
         invoice_departure_date: date,
         useruid: userid,
+        Invoice_statusinvoicestatusid: invoiceStatus,
     });
 
     let response = {
@@ -143,10 +183,11 @@ exports.editSale = async (req, res) => {
       return res.status(403).send({ success: 0, message: "Sem permissão" });
     }
 
-    let { date , user_id } = req.body;
+    let { date , user_id, invoiceStatus } = req.body;
 
     if (date) sale.invoice_departure_date = date;
-    if (museum_id) sale.useruid = museum_id;
+    if (user_id) sale.useruid = user_id;
+    if (invoiceStatus) sale.Invoice_statusinvoicestatusid = invoiceStatus;
     
 
     await sale.save();
@@ -175,8 +216,6 @@ exports.removeSale = async (req, res) => {
         .status(404)
         .send({ success: 0, message: "Registo de venda inexistente" });
     }
-
-    //let idOwner = artist.id_user; //ver se faz sentido
 
     let isAdmin = await utils.isAdmin(idUserToken); //Verificar
 

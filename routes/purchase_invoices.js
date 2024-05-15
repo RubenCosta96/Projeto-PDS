@@ -13,14 +13,15 @@ router.get("/purchaseInvoices/:id", purchaseInvoiceController.getPurchase);
 // list All purchases invoices related to a museum
 router.get("/purchaseInvoices/museum/:id", purchaseInvoiceController.getPurchasesByMuseum);
 
+// list All purchases invoices related to a Invoice Status
+router.get("/purchaseInvoices/InvoiceStatus/:id", purchaseInvoiceController.getPurchasesByInvoiceStatus);
+
 // Add purchase invoice
 router.post("/purchaseInvoices/add", login.required, purchaseInvoiceController.addPurchase);
 
-//testar
 // Edit purchase invoice
 router.put("/purchaseInvoices/edit/:id", login.required, purchaseInvoiceController.editPurchase);
 
-//testar
 // Remove purchase invoice
 router.delete("/purchaseInvoices/remove/:id", login.required, purchaseInvoiceController.removePurchase);
 
