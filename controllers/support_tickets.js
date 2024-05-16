@@ -9,6 +9,7 @@ exports.getSupportTickets = async (req, res) => {
 		let tickets;
 
 		let isManager = await utils.isManager(idUserToken);
+
 		if(isManager){
 			let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken }});
 			tickets = await db.support_ticket.findAll({ where: { museummid: manager.museummid }});
@@ -100,7 +101,6 @@ exports.addSupportTicket = async (req, res) => {
 			support_statesssid: 1,
 			museummid: museumId,
 			useruid: idUserToken,
-			priority: 1,
 		});
 
 		let response = {
@@ -124,7 +124,7 @@ exports.editSupportTicket = async (req, res) =>{
 
 		if(!ticket) return res.status(404).send({ success: 0, message: "Pedido de suporte inexistente" });
 		if(ticket.useruid != idUserToken) return res.status(404).send({ success: 0, message: "Não existem pedidos de suporte a si pertencentes" });
-		if(ticket.support_statesssid != 4) return res.status(403).send({ success: 0, message: 'Sem permissão' });
+		if(ticket.support_statesssid != 2) return res.status(403).send({ success: 0, message: 'Sem permissão' });
 
 		ticket.Description = description;
 		ticket.museummid = ticket.museummid;
@@ -148,7 +148,7 @@ exports.editSupportTicket = async (req, res) =>{
 	}
 };
 
-//falta alterar o estado do ticket 
+
 exports.assignmentPriorityEstimatedDeadline = async (req, res) => {
 	try {
 		let id = req.params.id;
@@ -181,7 +181,9 @@ exports.assignmentPriorityEstimatedDeadline = async (req, res) => {
 
 		support_ticket.priority = priority;
 		support_ticket.deadline = deadline;
-		//alterar o estado do ticket 
+		support_ticket.support_statesssid = 4;
+
+		
 		await support_ticket.save();
 
 		let response = {
@@ -229,10 +231,12 @@ exports.removeSupportTicket = async (req, res) => {
 	}
 };
 
-//verificar codigo
-exports.concludeSupportTicket = async (req, res) => {
+//Verificar codigo
+exports.SupportTicketSolved = async (req, res) => {
 	try {
 		let id = req.params.id;
+		let description = req.body.description;
+		let type = req.body.type;
 		let idUserToken = req.user.id;
 
 		let support_ticket = await db.support_ticket.findByPk(id);
@@ -242,21 +246,33 @@ exports.concludeSupportTicket = async (req, res) => {
 		}
 
 		let isManager = await utils.isManager(idUserToken);
-		if (!isManager) {
+		let isAdmin = await utils.isAdmin(idUserToken);
+
+		if (!isManager && !isAdmin) {
 			return res.status(403).send({ success: 0, message: "Sem permissão" });
 		}
-
-		let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken } });
-		if (support_ticket.museummid !== manager.museummid) {
-            return res.status(403).send({ success: 0, message: 'Ticket não pertence ao seu museu' });
-        }
+		if(isManager){
+			let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken } });
+			if (support_ticket.museummid !== manager.museummid) {
+				return res.status(403).send({ success: 0, message: 'Ticket não pertence ao seu museu' });
+			}
+		}else{
+			if(support_ticket.support_statesssid != 5){
+				return res.status(403).send({ success: 0, message: 'Ticket não redireçionado' });
+			}
+		}
 
 		if (support_ticket.support_statesssid === 3) {
 			return res.status(409).send({ success: 0, message: "Ticket já finalizado" });
 		}
+ 
+		support_ticket.support_statesssid = 9;
 
-		//verificar o estado a atribuir e como enviar a notificaçao 
-		support_ticket.support_statesssid = 3;
+		try {
+            await notification.addNotifications(description, type, support_ticket.useruid);
+        } catch (notificationError) {
+            return res.status(500).send({ error: notificationError, message: notificationError.message });
+        }
 
 		await support_ticket.save();
 
@@ -276,16 +292,18 @@ exports.approveSupportTicket = async (req, res) => {
     try {
         let id = req.params.id;
         let idUserToken = req.user.id;
+		let description = req.body.description;
+		let type = req.body.type;
 
 		let support_ticket = await db.support_ticket.findByPk(id);
-
+		
 		if (!support_ticket) {
 			return res.status(404).send({ success: 0, message: "Ticket inexistente" });
 		}
 
         let isManager = await utils.isManager(idUserToken);
 		if (!isManager) return res.status(403).send({ success: 0, message: 'Sem permissão' });
-
+		
         let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken } });
 		if (support_ticket.museummid !== manager.museummid) {
             return res.status(403).send({ success: 0, message: 'Ticket não pertence ao seu museu' });
@@ -294,12 +312,18 @@ exports.approveSupportTicket = async (req, res) => {
         if (support_ticket.support_statesssid != 1) {
             return res.status(409).send({ success: 0, message: "Impossível aprovar ticket" });
         }
+		
+        support_ticket.support_statesssid = 3;
+		
+		try {
+            await notification.addNotifications(description, type, support_ticket.useruid);
+        } catch (notificationError) {
+            return res.status(500).send({ error: notificationError, message: notificationError.message });
+        }
+		
 
-        support_ticket.support_statesssid = 2;
-		//Ver o porque de ser admin e nao manager, e enviar notificaçao de analise de ticket
-		support_ticket.admin_useruid = idUserToken;
 		await support_ticket.save();
-
+		
         let response = {
             success: 1,
             message: "Ticket aprovado com sucesso",
@@ -339,7 +363,11 @@ exports.sendNotifications = async (req, res) =>{
 			return res.status(404).send({ success: 0, message: "Apenas o responsável pelo ticket tem permissão" });
 		}
 
-		let newNotification = await notification.addNotifications(description, type, support_ticket.useruid);
+		try {
+            await notification.addNotifications(description, type, support_ticket.useruid);
+        } catch (notificationError) {
+            return res.status(500).send({ error: notificationError, message: notificationError.message });
+        }
 
 		let response = {
 			success: 1,
@@ -380,9 +408,13 @@ exports.informMissingData = async (req, res) =>{
 			return res.status(404).send({ success: 0, message: "Apenas o responsável pelo ticket tem permissão" });
 		}
 
-		let newNotification = await notification.addNotifications(description, type, support_ticket.useruid);
+		try {
+            await notification.addNotifications(description, type, support_ticket.useruid);
+        } catch (notificationError) {
+            return res.status(500).send({ error: notificationError, message: notificationError.message });
+        }
 
-		support_ticket.support_statesssid = 4;
+		support_ticket.support_statesssid = 2;
 
 		let response = {
 			success: 1,
@@ -441,3 +473,45 @@ exports.getSupportTicketsBySuportState = async (req, res) => {
 		return res.status(500).send({ error: err, message: err.message });
 	}
 };
+
+
+exports.redirectTicket = async (req, res) => {
+	try {
+		let id = req.params.id;
+		let idUserToken = req.user.id;
+
+		let isManager = await utils.isManager(idUserToken);
+		if (!isManager) return res.status(403).send({ success: 0, message: 'Sem permissão' });
+
+		let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken } });
+		
+		let support_ticket = await db.support_ticket.findByPk(id);
+
+		if (!support_ticket) {
+			return res.status(404).send({ success: 0, message: "Ticket inexistente" });
+		}
+
+		if (support_ticket.museummid !== manager.museummid) {
+            return res.status(403).send({ success: 0, message: 'Ticket não pertence ao seu museu' });
+        }
+
+		support_ticket.support_statesssid = 5;
+
+		
+		await support_ticket.save();
+
+		let response = {
+			success: 1,
+			message: "Ticket redirecionado com sucesso",
+		};
+
+		return res.status(200).send(response);
+	} catch (err) {
+		return res.status(500).send({ error: err, message: err.message });
+	}
+};
+
+
+
+
+// Fazer uma funçao para listar todos os tickets dos admins

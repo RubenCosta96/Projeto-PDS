@@ -19,13 +19,15 @@ router.put("/supportTickets/assignmentPriorityDeadline/:id", login.required, sup
 //Remove support ticket
 router.delete("/supportTickets/remove/:id", login.required, support_ticket_controller.removeSupportTicket);
 //Conclude support ticket
-router.put("/supportTickets/conclude/:id", login.required, support_ticket_controller.concludeSupportTicket);
+router.put("/supportTickets/solved/:id", login.required, support_ticket_controller.SupportTicketSolved);
 //Approve support ticket
 router.put("/supportTickets/approve/:id", login.required, support_ticket_controller.approveSupportTicket);
 //Send notifications
 router.post('/supportTickets/sendNotifications/:id', login.required, support_ticket_controller.sendNotifications);
 //Inform missing data
 router.post('/supportTickets/informMissingData/:id', login.required, support_ticket_controller.informMissingData);
+//Redirect ticket
+router.put('/supportTickets/redirect/:id', login.required, support_ticket_controller.redirectTicket);
 
 //List all support evaluations
 router.get("/supportTickets/evaluations", login.required, supportTicketEvaluationController.getAllSupportEvaluations);

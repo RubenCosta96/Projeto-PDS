@@ -178,6 +178,8 @@ function initModels(sequelize) {
   user.hasMany(sale_invoice, { as: "sale_invoices", foreignKey: "useruid"});
   support_evaluation.belongsTo(user, { as: "useru", foreignKey: "useruid"});
   user.hasMany(support_evaluation, { as: "support_evaluations", foreignKey: "useruid"});
+  support_ticket.belongsTo(user, { as: "useru", foreignKey: "useruid"});
+  user.hasMany(support_ticket, { as: "support_tickets", foreignKey: "useruid"});
   ticket.belongsTo(user, { as: "useru", foreignKey: "useruid"});
   user.hasMany(ticket, { as: "tickets", foreignKey: "useruid"});
   usermuseum.belongsTo(user, { as: "useru", foreignKey: "useruid"});

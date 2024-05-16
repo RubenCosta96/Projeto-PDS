@@ -17,7 +17,7 @@ module.exports = function(sequelize, DataTypes) {
     timestamps: false,
     indexes: [
       {
-        name: "PK__zip_code__240C764D385F5378",
+        name: "PK__zip_code__240C764D3CEA6EAD",
         unique: true,
         fields: [
           { name: "zipid" },

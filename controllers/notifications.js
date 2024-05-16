@@ -88,7 +88,6 @@ exports.getAllNotifications = async (req, res) =>{
 
 exports.addNotifications = async (description, type, user) =>{
     try{
-
         let newNotification = await db.notification.create({
             n_description: description,
             notification_typentid: type,
@@ -96,8 +95,13 @@ exports.addNotifications = async (description, type, user) =>{
             notification_statensid: 1
         });
 
+		let response = {
+			success: 1,
+			message: "Museu criado com sucesso",
+		};
+
+		return response;
     }catch (err) {
-		return res.status(500).send({ error: err, message: err.message });
+		throw new Error(err.message);
 	}
 };
-
