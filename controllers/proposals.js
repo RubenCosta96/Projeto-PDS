@@ -1,6 +1,7 @@
 const { where } = require("sequelize");
 const db = require("../config/mysql");
 const utils = require("../utils/index");
+const user = require("../models/user");
 
 exports.getAllProposals = async (req, res) => {
   try {
@@ -143,29 +144,22 @@ exports.addProposal = async (req, res) => {
   try {
     let price = req.body.price;
     let adId = req.body.adId;
-    let museumId = req.body.museumId;
     let idUserToken = req.user.id;
 
-    let isManager = await utils.isManager(idUserToken); //Verificar, pode ser assim mas acho que fazia sentido ver se o utilizador esta ligado ao museu em questao
-    let isAdmin = await utils.isAdmin(idUserToken);
+    let isManager = await utils.isManager(idUserToken);
 
-    if (!isManager && !isAdmin) {
+    if (!isManager) {
       return res.status(403).send({ success: 0, message: "Sem permissão" });
     }
 
-    let user = await db.user.findByPk(idUserToken);
-    if (!user) {
-      return res
-        .status(404)
-        .send({ success: 0, message: "Utilizador inexistente" });
-    }
-
+    let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken } });
     //Verificaçao para entradas repetidas nas BD
 
     let newProposal = await db.proposal.create({
         price: price,
         adadid: adId,
-        museummid: museumId,
+        museummid: manager.museummid,
+        proposal_statepsid: 1,
     });
 
     let response = {
@@ -193,8 +187,6 @@ exports.removeProposal = async (req, res) => {
         .send({ success: 0, message: "proposta inexistente" });
     }
 
-    //let idOwner = artist.id_user; //ver se faz sentido
-
     let isAdmin = await utils.isAdmin(idUserToken); //Verificar
 
     if (!isAdmin) {
@@ -211,6 +203,202 @@ exports.removeProposal = async (req, res) => {
     return res.status(200).send(response);
   } catch (err) {
     console.error("Error removing proposal:", err);
+    return res.status(500).send({ error: err, message: err.message });
+  }
+};
+
+
+exports.acceptProposal = async (req, res) => {
+  try {
+    let id = req.params.id;
+    let idUserToken = req.user.id;
+
+    const result = await db.proposal.findByPk(id);
+
+    if (!result) {
+      return res
+        .status(404)
+        .send({ success: 0, message: "proposta inexistente" });
+    }
+
+    const ad = await db.ad.findOne({
+      where:{
+        useruid: idUserToken,
+      }
+    });
+
+    if(!ad){
+      return res
+      .status(403)
+      .send({ success: 0, message: "Sem premissao" });
+    }
+
+    ad.ad_stateadstid = 2;
+    result.proposal_statepsid = 2;
+
+    await ad.save();
+    await result.save();
+
+    let response = {
+      success: 1,
+      message: "Proposta aceite",
+    };
+
+    return res.status(200).send(response);
+  } catch (err) {
+    console.error("Error accepting proposal:", err);
+    return res.status(500).send({ error: err, message: err.message });
+  }
+};
+
+
+//testar no fim 
+exports.rejectProposal = async (req, res) => {
+  try {
+    let id = req.params.id;
+    let idUserToken = req.user.id;
+
+    const result = await db.proposal.findByPk(id);
+
+    if (!result) {
+      return res
+        .status(404)
+        .send({ success: 0, message: "proposta inexistente" });
+    }
+
+    const ad = await db.ad.findOne({
+      where:{
+        useruid: idUserToken,
+      }
+    });
+
+    if(!ad){
+      return res
+      .status(403)
+      .send({ success: 0, message: "Sem premissao" });
+    }
+
+    ad.ad_stateadstid = 1;
+    result.proposal_statepsid = 3;
+
+    await ad.save();
+    await result.save();
+
+    let response = {
+      success: 1,
+      message: "Proposta recusada",
+    };
+
+    return res.status(200).send(response);
+  } catch (err) {
+    console.error("Error recusing proposal:", err);
+    return res.status(500).send({ error: err, message: err.message });
+  }
+};
+
+
+
+exports.confirmProposal = async (req, res) => {
+  try {
+    let id = req.params.id;
+    let idUserToken = req.user.id;
+
+    let isManager = utils.isManager(id);
+
+    if(!isManager){
+      return res.status(403).send({ success: 0, message: "Sem permissão" });
+    }
+
+    let museum = await db.usermuseum.findOne({
+      where:{
+        useruid: idUserToken,
+      }
+    });
+
+    const result = await db.proposal.findOne({
+      where:{
+        proposalid: id,
+        museummid: museum.museummid,
+      }
+    });
+
+    if (!result) {
+      return res
+        .status(404)
+        .send({ success: 0, message: "proposta inexistente" });
+    }
+
+    if(result.proposal_statepsid != 2){
+      return res.status(404).send({ success: 0, message: "proposta Nao esta disponivel para confirmaçao" });
+    }
+
+    result.proposal_statepsid = 4;
+
+    await result.save();
+
+    let response = {
+      success: 1,
+      message: "Proposta aceite",
+    };
+
+    return res.status(200).send(response);
+  } catch (err) {
+    console.error("Error accepting proposal:", err);
+    return res.status(500).send({ error: err, message: err.message });
+  }
+};
+
+//testar no fim 
+exports.cancelProposal = async (req, res) => {
+  try {
+    let id = req.params.id;
+    let idUserToken = req.user.id;
+
+    let isManager = utils.isManager(id);
+
+    if(!isManager){
+      return res.status(403).send({ success: 0, message: "Sem permissão" });
+    }
+
+    let museum = await db.usermuseum.findOne({
+      where:{
+        useruid: idUserToken,
+      }
+    });
+
+    const result = await db.proposal.findOne({
+      where:{
+        proposalid: id,
+        museummid: museum.museummid,
+      }
+    });
+
+    if (!result) {
+      return res
+        .status(404)
+        .send({ success: 0, message: "proposta inexistente" });
+    }
+
+    if(result.proposal_statepsid != 2){
+      return res.status(404).send({ success: 0, message: "proposta Nao esta disponivel para confirmaçao" });
+    }
+
+    let ad = await db.ad.findByPk(result.adadid);
+
+    result.proposal_statepsid = 5;
+    ad.ad_stateadstid = 1;
+
+    await result.save();
+    await ad.save();
+
+    let response = {
+      success: 1,
+      message: "Proposta cancelada",
+    };
+
+    return res.status(200).send(response);
+  } catch (err) {
+    console.error("Error cancel proposal:", err);
     return res.status(500).send({ error: err, message: err.message });
   }
 };

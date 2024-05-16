@@ -17,6 +17,10 @@ router.post("/ads/add", login.required, adController.addAd);
 router.put("/ads/edit/:id", login.required, adController.editAd);
 // Remove ad
 router.delete("/ads/remove/:id", login.required, adController.removeAd);
+// Confirm payment
+router.put("/ads/confirmPayment/:id", login.required, adController.confirmPayment);
+// Confirm Reception
+router.put("/ads/confirmReception/:id", login.required, adController.confirmReception);
 
 // List all ad states
 router.get("/ads/states", login.required,ad_statesController.getAdStates);

@@ -23,6 +23,17 @@ router.post("/proposals/add", login.required, ProposalController.addProposal);
 // Remove evaluation
 router.delete("/proposals/remove/:id", login.required, ProposalController.removeProposal);
 
+// Accept proposal
+router.put("/proposals/accept/:id", login.required, ProposalController.acceptProposal);
+
+// reject proposal
+router.put("/proposals/reject/:id", login.required, ProposalController.rejectProposal);
+
+// reject proposal
+router.put("/proposals/confirm/:id", login.required, ProposalController.confirmProposal);
+
+// reject proposal
+router.put("/proposals/cancel/:id", login.required, ProposalController.cancelProposal);
 
 //ProposalState
 

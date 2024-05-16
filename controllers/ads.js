@@ -60,18 +60,8 @@ exports.getAd = async (req, res) => {
 
 exports.addAd = async (req, res) => {
   try {
-    let { user_id, piece_id, description } = req.body;
-
-    /*
-    let isAdmin = await utils.isAdmin(idUserToken); //Verificar
-    if (!isAdmin && idOwner != idUserToken) {
-      return res.status(403).send({ success: 0, message: "Sem permissão" });
-    }
-    */
-    let user = await db.user.findByPk(user_id);
-    if (!user) {
-      return res.status(404).send({ success: 0, message: "Utilizador inexistente" });
-    }
+    let {piece_id, description } = req.body;
+    let userToken = req.user.id;
 
     let piece = await db.piece.findByPk(piece_id);
     if(!piece){
@@ -79,9 +69,10 @@ exports.addAd = async (req, res) => {
     }
 
     let newAd = await db.ad.create({
-      useruid: user_id,
+      useruid: userToken,
       piecepid: piece_id,
       description: description,
+      ad_stateadstid: 1,
     });
 
     let response = {
@@ -107,15 +98,6 @@ exports.editAd = async (req, res) => {
     if (!ad) {
       return res.status(404).send({ success: 0, message: "Anúncio inexistente" });
     }
-
-    /*
-      let idOwner = artist.id_user;
-  
-      let isAdmin = await utils.isAdmin(idUserToken); //Verificar
-      if (!isAdmin && idOwner != idUserToken) {
-        return res.status(403).send({ success: 0, message: "Sem permissão" });
-      }
-      */
 
     if (user_id) ad.useruid = user_id;
     if (piece_id) ad.piecepid = piece_id;
@@ -164,3 +146,75 @@ exports.removeAd = async (req, res) => {
     return res.status(500).send({ error: err, message: err.message });
   }
 };
+
+
+exports.confirmPayment = async (req, res) => {
+  try {
+    let id = req.params.id;
+    let propId = req.body.proposalId;
+    let idUserToken = req.user.id;
+
+    let ad = await db.ad.findByPk(id);
+
+    if (!ad) {
+      return res.status(404).send({ success: 0, message: "Anúncio inexistente" });
+    }
+
+    let prop = await db.proposal.findByPk(propId);
+
+    if(prop.proposal_statepsid != 4 || ad.adid != prop.adadid){
+      return res.status(403).send({ success: 0, message: "Sem permissão" });
+    }
+
+    ad.ad_stateadstid = 3;
+
+    await ad.save();
+
+    let response = {
+      success: 1,
+      message: "Pagamento confirmado com sucesso",
+    };
+
+    return res.status(200).send(response);
+  } catch (err) {
+    console.error("Error editing ad:", err);
+    return res.status(500).send({ error: err, message: err.message });
+  }
+};
+
+
+exports.confirmReception = async (req, res) => {
+  try {
+    let id = req.params.id;
+    let propId = req.body.proposalId;
+    let idUserToken = req.user.id;
+
+    let ad = await db.ad.findByPk(id);
+
+    if (!ad) {
+      return res.status(404).send({ success: 0, message: "Anúncio inexistente" });
+    }
+
+    let prop = await db.proposal.findByPk(propId);
+
+    if(prop.proposal_statepsid != 4 || ad.adid != prop.adadid || ad.ad_stateadstid != 3){
+      return res.status(403).send({ success: 0, message: "Sem permissão" });
+    }
+
+    ad.ad_stateadstid = 4;
+
+    await ad.save();
+
+    let response = {
+      success: 1,
+      message: "Receçao confirmada com sucesso",
+    };
+
+    return res.status(200).send(response);
+  } catch (err) {
+    console.error("Error editing ad:", err);
+    return res.status(500).send({ error: err, message: err.message });
+  }
+};
+
+

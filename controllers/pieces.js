@@ -176,11 +176,6 @@ exports.addPieces = async (req, res) => {
         let museum = req.body.museum;
 		let idUserToken = req.user.id;
 
-        let isAdmin = await utils.isAdmin(idUserToken);
-		if (!isAdmin) {
-			return res.status(403).send({ success: 0, message: "Sem permissão" });
-		}
-
 		let newPiece = await db.piece.create({
 			piece_name: name,
 			artistaid: artist,
