@@ -1,41 +1,17 @@
 const db = require('../config/mysql');
 const utils = require('../utils/index');
 const notification = require('./notifications');
+const services = require('../Services/support_tickets')
 
 exports.getSupportTickets = async (req, res) => {
 	try {
 		let idUserToken = req.user.id;
 
-		let tickets;
+		
+		let response = await services.SupportTickets(idUserToken);
 
-		let isManager = await utils.isManager(idUserToken);
-
-		if(isManager){
-			let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken }});
-			tickets = await db.support_ticket.findAll({ where: { museummid: manager.museummid }});
-		}else{
-			tickets = await db.support_ticket.findAll({ where: { useruid: idUserToken }});
-		} 
-
-		if (tickets.length === 0)
+		if (response.length === 0)
 			return res.status(404).send({ success: 0, message: "Não existem pedidos de suporte" });
-
-		let response = {
-			success: 1,
-			length: tickets.length,
-			results: tickets.map((support_ticket) => {
-				return {
-					id: support_ticket.stid,
-					description: support_ticket.Description,
-					statessid: support_ticket.support_statesssid,
-					museumid: support_ticket.museummid,
-					userid: support_ticket.useruid,
-					priority: support_ticket.priority,
-					responsible: support_ticket.admin_useruid,
-					deadline: support_ticket.deadline,
-				};
-			}),
-		};
 
 		return res.status(200).send(response);
 	} catch (err) {

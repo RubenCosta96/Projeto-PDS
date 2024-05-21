@@ -6,6 +6,7 @@ exports.getAllTickets = async (req, res) => {
         let idUserToken = req.user.id;
 
         let isAdmin = await utils.isAdmin(idUserToken);
+        
         if (isAdmin) {
             let tickets = await db.ticket.findAll();
             if (tickets.length === 0)
