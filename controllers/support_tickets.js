@@ -24,37 +24,11 @@ exports.getSupportTicket = async (req, res) => {
         let idUserToken = req.user.id;
         let id = req.params.id;
 
-        let ticket;
+        let response = await services.getSupportTicket(idUserToken,id);
 
-        let isManager = await utils.isManager(idUserToken);
-        if (isManager) {
-            let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken }});
-            ticket = await db.support_ticket.findOne({ where: { museummid: manager.museummid, stid: id}});
-        } else {
-            ticket = await db.support_ticket.findOne({ where: { useruid: idUserToken, stid: id }});
-        } 
-
-        if (!ticket) {
-            return res.status(404).send({ success: 0, message: "Pedido de suporte inexistente ou não pertencente ao seu museu" });
-        }
-
-        let response = {
-            success: 1,
-            length: 1,
-            results: [
-                {
-                    id: ticket.stid,
-                    description: ticket.Description,
-                    statessid: ticket.support_statesssid,
-                    museumid: ticket.museummid,
-                    userid: ticket.useruid,
-                    priority: ticket.priority,
-                    responsible: ticket.admin_useruid,
-                    deadline: ticket.deadline,
-                },
-            ],
-        };
-
+		if(response.length === 0)
+			return res.status(404).send({ success: 0, message: "Não existem pedidos de suporte" });
+		
         return res.status(200).send(response);
     } catch (err) {
         return res.status(500).send({ error: err, message: err.message });
