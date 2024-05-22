@@ -3,29 +3,29 @@ const utils = require("../utils/index");
 
 exports.addPieces = async (name, artistId, collectionId, categoryId, museumId) => {
 	try {
-
+		
         if(!name || !artistId || !collectionId || !categoryId){
             throw new Error("Dados em falta");
         }
-
+		
 		let artist = await db.artist.findByPk(artistId);
-
+		
 		if(!artist){
             throw new Error("Artista Inexistente!");
         }
-
+		
         let collection = await db.collection.findByPk(collectionId);
-
+		
 		if(!collection){
             throw new Error("Coleção Inexistente!");
         }
-
+		
         let category = await db.piece_category.findByPk(categoryId);
 
 		if(!category){
             throw new Error("Categoria Inexistente!");
         }
-
+		
 		let newPiece = await db.piece.create({
 			piece_name: name,
 			artistaid: artistId,

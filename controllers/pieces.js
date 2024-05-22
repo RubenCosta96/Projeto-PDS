@@ -73,7 +73,7 @@ exports.addPieces = async (req, res) => {
         let collection = req.body.collection;
         let category = req.body.category;
         let museum = req.body.museum;
-
+		
 		let response = await services.addPieces(name, artist, collection, category, museum);
 
 		return res.status(200).send(response);

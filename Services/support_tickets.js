@@ -2,6 +2,7 @@ const db = require('../config/mysql');
 const utils = require("../utils/index");
 const notification = require('../controllers/notifications');
 
+
 exports.SupportTickets = async(idUserToken) => {
     let user = await utils.userType(idUserToken);
     let result;
@@ -69,7 +70,88 @@ exports.SupportTickets = async(idUserToken) => {
     return response;
 }
 
+/*
+exports.SupportTickets = async (idUserToken) => {
+    let user = await utils.userType(idUserToken);
+    let result;
 
+    try {
+        switch (user) {
+            case 1:     //Admin, tem acesso a todos os Tickets que estejam com o estado 
+                result = await db.support_ticket.findAll({
+                    where: {
+                        support_statesssid: 5,      //Verificar se esta de acordo com a bd
+                    },
+                    include: [{
+                        model: db.museum,
+                        as: 'museumm',
+                        attributes: ['museum_name']
+                    }]
+                });
+                break;
+            case 2:     //Manager, tem acesso as tickets do seu museu
+                let museum = await db.usermuseum.findOne({
+                    where: {
+                        useruid: idUserToken,
+                    }
+                });
+                result = await db.support_ticket.findAll({
+                    where: {
+                        museummid: museum.museummid,
+                    },
+                    include: [{
+                        model: db.museum,
+                        as: 'museumm',
+                        attributes: ['museum_name']
+                    }]
+                });
+                break;
+            case 3:     //User, tem acesso aos seus tickets
+                result = await db.support_ticket.findAll({
+                    where: {
+                        useruid: idUserToken,
+                    },
+                    include: [{
+                        model: db.museum,
+                        as: 'museumm',
+                        attributes: ['museum_name']
+                    },{
+                        model: db.user,
+                        as: 'useruid',
+                        attributes: ['user_name']
+                    }
+                ]
+                });
+                break;
+            default:
+                throw new Error("Utilizador nao reconhecido!");
+        }
+        
+
+        let response = {
+            success: 1,
+            length: result.length,
+            results: result.map((support_ticket) => {
+                return {
+                    id: support_ticket.stid,
+                    description: support_ticket.Description,
+                    statessid: support_ticket.support_statesssid,
+                    museumName: support_ticket.museumm.museum_name, // Nome do museu
+                    userid: support_ticket.useruid,
+                    priority: support_ticket.priority,
+                    responsible: support_ticket.admin_useruid,
+                    deadline: support_ticket.deadline,
+                };
+            }),
+        };
+
+        return response;
+    } catch (err) {
+        throw new Error(err);
+    }
+}
+
+/*
 exports.getSupportTicket = async(idUserToken, idTicket) => {
     let user = await utils.userType(idUserToken);
     let result;
@@ -149,6 +231,8 @@ exports.getSupportTicket = async(idUserToken, idTicket) => {
 
     return response;
 }
+*/
+
 
 exports.addSupportTicket = async (description, museumId, idUserToken) => {
 	try {
