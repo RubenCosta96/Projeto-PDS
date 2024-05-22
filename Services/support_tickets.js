@@ -1,5 +1,6 @@
 const db = require('../config/mysql');
 const utils = require("../utils/index");
+const notification = require('../controllers/notifications');
 
 exports.SupportTickets = async(idUserToken) => {
     let user = await utils.userType(idUserToken);
@@ -67,6 +68,7 @@ exports.SupportTickets = async(idUserToken) => {
 
     return response;
 }
+
 
 exports.getSupportTicket = async(idUserToken, idTicket) => {
     let user = await utils.userType(idUserToken);
@@ -150,13 +152,8 @@ exports.getSupportTicket = async(idUserToken, idTicket) => {
 
 exports.addSupportTicket = async (description, museumId, idUserToken) => {
 	try {
-        console.log("teste")
-        console.log(description)
-        console.log(museumId)
-        console.log(idUserToken)
 
-        if(!description || !museumId || idUserToken){
-            console.log("dentro do if")
+        if(!description || !museumId || !idUserToken){
             throw new Error("Dados em falta");
         }
 
@@ -199,7 +196,6 @@ exports.editSupportTicket = async (description, idUserToken, id) =>{
 		ticket.Description = description;
 		ticket.museummid = ticket.museummid;
 		ticket.useruid = idUserToken;
-		ticket.priority = 1;
 		ticket.support_statesssid = 1;
 
 		await ticket.save();
@@ -225,6 +221,9 @@ exports.assignmentPriorityEstimatedDeadline = async (id, idUserToken,priority,de
                 throw new Error("Sem permissao!");
             case 2:     //Manager, tem acesso as tickets do seu museu
                 try{
+                    let support_ticket = await db.support_ticket.findByPk(id);
+                    let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken } });
+
                     if (!support_ticket) 
                         throw new Error("Ticket inexistente");
             
@@ -294,7 +293,6 @@ exports.removeSupportTicket = async (id, idUserToken) => {
             default:
                 throw new Error("Utilizador nao reconhecido!");            
         }
-
 		
 
 		let response = {
@@ -308,7 +306,8 @@ exports.removeSupportTicket = async (id, idUserToken) => {
 	}
 };
 
-//---------------------------Mudar os controllers---------------------------
+
+
 //Verificar codigo
 exports.SupportTicketSolved = async (id, description,type,idUserToken) => {
 	try {
@@ -330,7 +329,7 @@ exports.SupportTicketSolved = async (id, description,type,idUserToken) => {
                 
                 ticket.support_statesssid = 9;
 
-                await notification.addNotifications(description, type, support_ticket.useruid);
+                await notification.addNotifications(description, type, ticket.useruid);
         
                 await ticket.save();
             }catch(err){
@@ -354,7 +353,7 @@ exports.SupportTicketSolved = async (id, description,type,idUserToken) => {
                 
                 ticket.support_statesssid = 9;
 
-                await notification.addNotifications(description, type, support_ticket.useruid);
+                await notification.addNotifications(description, type, ticket.useruid);
         
                 await ticket.save();
             }catch(err){
@@ -428,7 +427,7 @@ exports.approveSupportTicket = async (id, idUserToken, description, type) => {
     }
 };
 
-
+//Testar 
 exports.sendNotifications = async (description, type, id, idUserToken) =>{
 	try{
         let user = await utils.userType(idUserToken);
@@ -493,12 +492,11 @@ exports.informMissingData = async (description, type, id, idUserToken) =>{
                 if (support_ticket.museummid !== manager.museummid)
                     throw new Error("Ticket não pertence ao seu museu");
         
-                if(support_ticket.admin_useruid != idUserToken)
-                    throw new Error("Apenas o responsável pelo ticket tem permissão");
-        
                 await notification.addNotifications(description, type, support_ticket.useruid);
         
                 support_ticket.support_statesssid = 2;
+
+                support_ticket.save();
             }catch(err){
                 throw new Error(err);
             }
@@ -522,10 +520,11 @@ exports.informMissingData = async (description, type, id, idUserToken) =>{
 
 
 //
-exports.getSupportTicketsBySuportState = async (state, idUserToken, tickets) => {
+exports.getSupportTicketsBySuportState = async (state, idUserToken) => {
 	try {
         let user = await utils.userType(idUserToken);
-    
+        let tickets;
+        
         switch(user){
             case 1:     //Admin, nao tem acesso a esta funçao 
                 throw new Error("Sem permissao!");
@@ -602,6 +601,9 @@ exports.redirectTicket = async (id, idUserToken) => {
         
                 if (support_ticket.museummid !== manager.museummid)
                     throw new Error("Ticket não pertence ao seu museu");
+
+                if (support_ticket.support_statesssid !== 4)
+                    throw new Error("Sem permissao");
         
                 support_ticket.support_statesssid = 5;
                 

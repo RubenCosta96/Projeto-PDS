@@ -10,6 +10,8 @@ const login = require("../middleware/login");
 router.get("/supportTickets", login.required, support_ticket_controller.getSupportTickets);
 //List specific support ticket
 router.get("/supportTickets/:id", login.required, support_ticket_controller.getSupportTicket);
+//List all support tickets in a determinate state
+router.get("/supportTickets/state/:id", login.required, support_ticket_controller.getSupportTicketsBySuportState);
 //Add support ticket
 router.post("/supportTickets/add", login.required, support_ticket_controller.addSupportTicket);
 //Edit support ticket
