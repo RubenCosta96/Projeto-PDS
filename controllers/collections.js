@@ -3,7 +3,7 @@ const utils = require("../utils/index");
 
 exports.getCollections = async (req, res) => {
   try {
-    //Verificar se é utilizador senão dar erro!
+    //Verificar se é utilizador se não dar erro!
 
     let collection = await db.collection.findAll();
 
@@ -29,12 +29,6 @@ exports.getCollections = async (req, res) => {
 exports.getCollection = async (req, res) => {
   try {
     let id = req.params.id;
-    /*
-    let idUserToken = req.user.id;
-
-    let isAdmin = await utils.isAdmin(idUserToken);
-    if (!isAdmin && id != idUserToken) return res.status(403).send({ success: 0, message: "Sem permissão" });
-    */
 
     let collection = await db.collection.findByPk(id);
 

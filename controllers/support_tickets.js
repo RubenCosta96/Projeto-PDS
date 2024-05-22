@@ -1,7 +1,7 @@
 const db = require('../config/mysql');
 const utils = require('../utils/index');
 const notification = require('./notifications');
-const services = require('../Services/support_tickets')
+const services = require('../services/support_tickets')
 
 exports.getSupportTickets = async (req, res) => {
 	try {

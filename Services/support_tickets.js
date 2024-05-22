@@ -1,4 +1,3 @@
-const { where } = require('sequelize');
 const db = require('../config/mysql');
 const utils = require("../utils/index");
 
@@ -68,7 +67,6 @@ exports.SupportTickets = async(idUserToken) => {
 
     return response;
 }
-
 
 exports.getSupportTicket = async(idUserToken, idTicket) => {
     let user = await utils.userType(idUserToken);
