@@ -4,10 +4,10 @@ const notification = require('../controllers/notifications');
 const { where } = require('sequelize');
 
 exports.SupportTickets = async (idUserToken) => {
-    let user = await utils.userType(idUserToken);
-    let result;
-
     try {
+        let user = await utils.userType(idUserToken);
+        let result;
+        
         switch (user) {
             case 1:     //Admin, tem acesso a todos os Tickets que estejam com o estado 
                 result = await db.support_ticket.findAll({
