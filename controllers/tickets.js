@@ -41,39 +41,3 @@ exports.addTickets = async (req, res) => {
 		return res.status(500).send({ error: err, message: err.message });
 	}
 };
-
-exports.editPriceCategory = async (req, res) => {
-	try {
-		let idUserToken = req.user.id;
-		let price = req.body.price;
-		let eventId = req.params.id;
-		let ticketCategory = req.body.id;
-
-		let isManager = await utils.isManager(idUserToken);
-		if (!isAdmin) return res.status(403).send({ success: 0, message: "Sem permissão" });
-
-		let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken } });
-
-		let event = await db.event.findByPk(eventId);
-
-		if (!event) {
-			return res.status(404).send({ success: 0, message: "Evento inexistente" });
-		}
-
-		if (event.museummid !== manager.museummid) {
-			return res.status(403).send({ success: 0, message: "Ticket não pertence ao seu museu" });
-		}
-
-		event.event_price = price;
-		await event.save();
-
-		let response = {
-			success: 1,
-			message: "Preço editado com sucesso",
-		};
-
-		return res.status(200).send(response);
-	} catch (err) {
-		return res.status(500).send({ error: err, message: err.message });
-	}
-};

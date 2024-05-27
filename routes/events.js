@@ -8,18 +8,20 @@ const event_typesController = require("../controllers/event_types");
 const login = require("../middleware/login");
 const utils = require("../utils");
 
-//List all collections
+//List all events
 router.get("/events", eventsController.getEvents);
 // List specific collection
 router.get("/events/:id", eventsController.getEvent);
 // List all events by museum
 router.get("/events/museum/:id", eventsController.getEventsByMuseum);
-// Add collection
+// Add event
 router.post("/events/add", login.required, eventsController.addEvent);
-// Edit collection
+// Edit event
 router.put("/events/edit/:id", login.required, eventsController.editEvent);
 // Remove artist
 router.delete("/events/remove/:id", login.required, eventsController.removeEvent);
+// Edit price event
+router.put("/events/edit/price/:id", login.required, eventsController.editPriceEvent);
 
 // List all ad state evaluation
 router.get("/events/evaluation", event_evalController.getEventsEval);

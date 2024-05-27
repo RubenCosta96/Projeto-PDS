@@ -11,8 +11,6 @@ router.get("/tickets", login.required,ticketsController.getAllTickets);
 router.get("/tickets/event/:id", login.required,ticketsController.getAllTicketsByEvent);
 // Add tickets
 router.post("/tickets/add/:id", login.required,ticketsController.addTickets);
-// Edit price tickets
-router.put("/tickets/edit/price/:id", login.required,ticketsController.editPriceCategory);
 // List all ticket status
 router.get("/tickets/status", login.required,ticketStatusController.getAllTicketStatus);
 // List specific status

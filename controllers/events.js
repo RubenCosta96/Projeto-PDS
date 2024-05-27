@@ -54,9 +54,9 @@ exports.editEvent = async (req, res) => {
 	try {
 		let id = req.params.id;
 		let idUserToken = req.user.id;
-		let { start_date, end_date, type, museum, status, price } = req.body;
+		let { start_date, end_date, type,status, price } = req.body;
 
-		let response = await services.editEvent(idUserToken, start_date, end_date, type, museum, status, price);
+		let response = await services.editEvent(id,idUserToken, start_date, end_date, type,status, price);
 
 		return res.status(200).send(response);
 	} catch (err) {
@@ -75,6 +75,20 @@ exports.removeEvent = async (req, res) => {
 		return res.status(200).send(response);
 	} catch (err) {
 		console.error("Error removing event:", err);
+		return res.status(500).send({ error: err, message: err.message });
+	}
+};
+
+exports.editPriceEvent = async (req, res) => {
+	try {
+		let idUserToken = req.user.id;
+		let price = req.body.price;
+		let eventId = req.params.id;
+
+		let response = await services.editPriceEvent(idUserToken, eventId, price);
+
+		return res.status(200).send(response);
+	} catch (err) {
 		return res.status(500).send({ error: err, message: err.message });
 	}
 };
