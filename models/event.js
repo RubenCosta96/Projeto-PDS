@@ -50,7 +50,7 @@ module.exports = function(sequelize, DataTypes) {
     timestamps: false,
     indexes: [
       {
-        name: "PK__event__D9509F6DE72C701E",
+        name: "PK__event__D9509F6DCBC1C663",
         unique: true,
         fields: [
           { name: "eid" },
