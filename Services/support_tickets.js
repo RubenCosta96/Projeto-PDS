@@ -1,6 +1,7 @@
 const db = require('../config/mysql');
 const utils = require("../utils/index");
 const notification = require('../controllers/notifications');
+const { where } = require('sequelize');
 
 exports.SupportTickets = async (idUserToken) => {
     let user = await utils.userType(idUserToken);
@@ -17,7 +18,11 @@ exports.SupportTickets = async (idUserToken) => {
                         model: db.museum,
                         as: 'museumm',
                         attributes: ['museum_name']
-                    }]
+                    },{
+                        model: db.user,
+                        as: 'useru',
+                        attributes: ['user_name']
+                    },]
                 });
                 break;
             case 2:     //Manager, tem acesso as tickets do seu museu
@@ -71,11 +76,11 @@ exports.SupportTickets = async (idUserToken) => {
                     id: support_ticket.stid,
                     description: support_ticket.Description,
                     statessid: support_ticket.support_statesssid,
+                    museumid: support_ticket.museummid,
                     museumName: support_ticket.museumm.museum_name, // Nome do museu
                     userid: support_ticket.useruid,
                     username: support_ticket.useru.user_name,   //user name
                     priority: support_ticket.priority,
-                    responsible: support_ticket.admin_useruid,
                     deadline: support_ticket.deadline,
                 };
             }),
@@ -473,7 +478,20 @@ exports.getSupportTicketsBySuportState = async (state, idUserToken) => {
                     throw new Error("Não existe esse estado de pedido de suporte");
                 
                 let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken }});
-			    tickets = await db.support_ticket.findAll({ where: { museummid: manager.museummid, support_statesssid: state}});
+			    tickets = await db.support_ticket.findAll({
+                    where: { 
+                        museummid: manager.museummid,
+                        support_statesssid: state
+                    },include: [{
+                        model: db.museum,
+                        as: 'museumm',
+                        attributes: ['museum_name']
+                    },{
+                        model: db.user,
+                        as: 'useru',
+                        attributes: ['user_name']
+                    }]
+                });
             }catch(err){
                 throw new Error(err);
             }
@@ -485,7 +503,21 @@ exports.getSupportTicketsBySuportState = async (state, idUserToken) => {
                 if(!result)
                     throw new Error("Não existe esse estado de pedido de suporte");
 
-                tickets = await db.support_ticket.findAll({ where: { useruid: idUserToken, support_statesssid: state}});
+                tickets = await db.support_ticket.findAll({
+                    where: {
+                        useruid: idUserToken, 
+                        support_statesssid: state
+                    },
+                    include: [{
+                        model: db.museum,
+                        as: 'museumm',
+                        attributes: ['museum_name']
+                    },{
+                        model: db.user,
+                        as: 'useru',
+                        attributes: ['user_name']
+                    }]
+                });
             }catch(err){
                 throw new Error(err);
             }
@@ -503,11 +535,12 @@ exports.getSupportTicketsBySuportState = async (state, idUserToken) => {
 				return {
 					id: support_ticket.stid,
 					description: support_ticket.Description,
-					statessid: support_ticket.support_statesssid,
+					ticketState: support_ticket.support_statesssid,
 					museumid: support_ticket.museummid,
+					museumName: support_ticket.museumm.museum_name, // Nome do museu
 					userid: support_ticket.useruid,
+                    username: support_ticket.useru.user_name,   //user name
 					priority: support_ticket.priority,
-					responsible: support_ticket.admin_useruid,
 					deadline: support_ticket.deadline,
 				};
 			}),
@@ -565,9 +598,3 @@ exports.redirectTicket = async (id, idUserToken) => {
 		throw new Error(err);
 	}
 };
-
-
-
-
-
-//---------------------------Mudar os controllers---------------------------
