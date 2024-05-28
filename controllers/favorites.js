@@ -1,5 +1,6 @@
+const utils = require("../utils/index");
 const db = require("../config/mysql");
-const db = require("../Services/favorites");
+const services = require("../Services/favorites");
 
 exports.getFavorites = async (req, res) => {
     try {
