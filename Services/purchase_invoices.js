@@ -1,7 +1,7 @@
 const { where } = require("sequelize");
 const db = require("../config/mysql");
 const utils = require("../utils/index");
-const services = require("../Services/purchase_invoices")
+const { response } = require("express");
 
 exports.getAllPurchases = async (req, res) => {
   try {
@@ -243,15 +243,112 @@ exports.removePurchase = async (req, res) => {
 };
 
 
-exports.emitePurchase = async (req, res) => {
+exports.emitePurchase = async (idUserToken, purchaseId) => {
   try {
-    let id = req.params.id;
-    let idUserToken = req.user.id;
+    let user = await utils.userType(idUserToken);
+    let purchase;
+    let lines;
 
-    let response = await services.emitePurchase(idUserToken, id)
+    switch (user) {
+      case 1: //Admin
+        purchase = await db.purchase_invoice.findByPk(purchaseId);
 
-    return res.status(200).send(response);
+        if(!purchase)
+          throw new Error("Compra nao encontrada!");
+    
+        lines = await db.purchase_line.findAll({
+          where:{
+            purchase_invoicepurchase_invoiceid: purchase.purchase_invoiceid
+          }
+        });
+    
+        for(let line of lines){
+          this.productQuantity(idUserToken,line.productprodid, line.purline_quantity);
+        }
+    
+        purchase.Invoice_statusinvoicestatusid = 2;
+    
+        purchase.save();
+        break;
+      case 2: //Manager
+          purchase = await db.purchase_invoice.findByPk(purchaseId);
+
+          if(!purchase)
+            throw new Error("Compra nao encontrada!");
+      
+          lines = await db.purchase_line.findAll({
+            where:{
+              purchase_invoicepurchase_invoiceid: purchase.purchase_invoiceid
+            }
+          });
+      
+          for(let line of lines){
+            await this.productQuantity(idUserToken,line.productprodid, line.purline_quantity);
+          }
+      
+          purchase.Invoice_statusinvoicestatusid = 2;
+      
+          purchase.save();
+        break;
+      case 3: //User, nao tem acesso a esta funçao
+        throw new Error("Sem permissao!");
+      default:
+        throw new Error("Utilizador nao reconhecido!");
+    }
+
+    let response = {  
+      success: 1,
+      message: "Compra emitida com sucesso!",
+    };
+
+    return response;
   } catch (err) {
-    return res.status(500).send({ error: err, message: err.message });
+    throw new Error(err);
   }
 };
+
+
+exports.productQuantity = async (idUserToken, idProduct, quantity) => {
+  try {
+    let user = await utils.userType(idUserToken);
+    let product;
+
+    switch (user) {
+      case 1: //Admin
+        
+        product = await db.product.findByPk(idProduct);
+        
+        if(!product)
+          throw new Error("Produto nao encontrada!");
+    
+        product.product_quantity += quantity;
+    
+        await product.save();
+        break;
+      case 2: //Manager
+        product = await db.product.findByPk(idProduct);
+
+        if(!product)
+          throw new Error("Produto nao encontrada!");
+    
+        product.product_quantity += quantity;
+    
+        await product.save();
+        break;
+      case 3: //User, nao tem acesso a esta funçao
+        throw new Error("Sem permissao!");
+      default:
+        throw new Error("Utilizador nao reconhecido!");
+    }
+
+    let response = {
+      success: 1,
+      message: "Quantidade do produto atualizada com sucesso!",
+    };
+
+    return response;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+

@@ -45,10 +45,10 @@ exports.getLinesByPurchase = async (req, res) => {
             length: lines.length,
             results: lines.map((purchase_line) => {
             return {
-                id: purchaseLines.purchase_lid,
-                quantity: purchaseLines.purline_quantity,
-                saleInvoiceId: purchaseLines.purchase_invoicepurchase_invoiceid,
-                productId: purchaseLines.productprodid,
+                id: purchase_line.purchase_lid,
+                quantity: purchase_line.purline_quantity,
+                saleInvoiceId: purchase_line.purchase_invoicepurchase_invoiceid,
+                productId: purchase_line.productprodid,
             };
             }),
         };
@@ -91,24 +91,21 @@ exports.addPurchaseLine = async (req, res) => {
     let quantity = req.body.quantity;
     let purchaseId = req.body.PurchaseInvoiceId;
     let prodId = req.body.productId;
-    let idOwner = req.body.id;
     let idUserToken = req.user.id;
 
     let isManager = await utils.isManager(idUserToken);
     let isAdmin = await utils.isAdmin(idUserToken);
 
-    if (!isManager && idOwner != idUserToken && isAdmin) {
+    if (!isManager && !isAdmin) {
       return res.status(403).send({ success: 0, message: "Sem permissão" });
     }
 
-    let user = await db.user.findByPk(idOwner);
+    let user = await db.user.findByPk(idUserToken);
     if (!user) {
       return res
         .status(404)
         .send({ success: 0, message: "Utilizador inexistente" });
     }
-
-    //Verificaçao para entradas repetidas nas BD
     
     let newPurchaseLine = await db.purchase_line.create({
         purline_quantity: quantity,

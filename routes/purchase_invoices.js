@@ -25,4 +25,7 @@ router.put("/purchaseInvoices/edit/:id", login.required, purchaseInvoiceControll
 // Remove purchase invoice
 router.delete("/purchaseInvoices/remove/:id", login.required, purchaseInvoiceController.removePurchase);
 
+// Emitir purchase invoice
+router.put("/purchaseInvoices/emite/:id", login.required, purchaseInvoiceController.emitePurchase);
+
 module.exports = router;
