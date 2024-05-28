@@ -12,7 +12,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     product_price: {
-      type: DataTypes.REAL,
+      type: DataTypes.DOUBLE,
       allowNull: false
     },
     product_quantity: {
@@ -38,14 +38,28 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'product',
-    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK__product__31A47329C023AD41",
+        name: "PRIMARY",
         unique: true,
+        using: "BTREE",
         fields: [
           { name: "prodid" },
+        ]
+      },
+      {
+        name: "FKproduct180280",
+        using: "BTREE",
+        fields: [
+          { name: "museummid" },
+        ]
+      },
+      {
+        name: "FKproduct885527",
+        using: "BTREE",
+        fields: [
+          { name: "product_typeptid" },
         ]
       },
     ]

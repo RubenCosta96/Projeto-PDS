@@ -26,14 +26,21 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'cart',
-    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK__cart__10E6B8F6A57DE352",
+        name: "PRIMARY",
         unique: true,
+        using: "BTREE",
         fields: [
           { name: "useruid" },
+          { name: "productprodid" },
+        ]
+      },
+      {
+        name: "FKcart422187",
+        using: "BTREE",
+        fields: [
           { name: "productprodid" },
         ]
       },

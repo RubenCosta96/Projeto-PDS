@@ -30,14 +30,21 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'museum_evaluation',
-    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK__museum_e__1DA64CBAC02A6781",
+        name: "PRIMARY",
         unique: true,
+        using: "BTREE",
         fields: [
           { name: "museummid" },
+          { name: "useruid" },
+        ]
+      },
+      {
+        name: "FKmuseum_eva930721",
+        using: "BTREE",
+        fields: [
           { name: "useruid" },
         ]
       },

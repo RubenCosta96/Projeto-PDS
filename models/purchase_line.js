@@ -21,19 +21,37 @@ module.exports = function(sequelize, DataTypes) {
     },
     purchase_invoicepurchase_invoiceid: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      references: {
+        model: 'purchase_invoice',
+        key: 'purchase_invoiceid'
+      }
     }
   }, {
     sequelize,
     tableName: 'purchase_line',
-    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK__purchase__AD1FF6C04442CBC0",
+        name: "PRIMARY",
         unique: true,
+        using: "BTREE",
         fields: [
           { name: "purchase_lid" },
+        ]
+      },
+      {
+        name: "FKpurchase_l690993",
+        using: "BTREE",
+        fields: [
+          { name: "productprodid" },
+        ]
+      },
+      {
+        name: "FKpurchase_l442533",
+        using: "BTREE",
+        fields: [
+          { name: "purchase_invoicepurchase_invoiceid" },
         ]
       },
     ]

@@ -15,7 +15,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: false
     },
-    state: {
+    premium: {
       type: DataTypes.INTEGER,
       allowNull: true
     },
@@ -42,14 +42,28 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'museum',
-    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK__museum__DF5032EC5C05409C",
+        name: "PRIMARY",
         unique: true,
+        using: "BTREE",
         fields: [
           { name: "mid" },
+        ]
+      },
+      {
+        name: "FKmuseum6780",
+        using: "BTREE",
+        fields: [
+          { name: "museum_categorymcid" },
+        ]
+      },
+      {
+        name: "FKmuseum371835",
+        using: "BTREE",
+        fields: [
+          { name: "zip_codezipid" },
         ]
       },
     ]
