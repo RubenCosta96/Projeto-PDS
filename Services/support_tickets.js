@@ -57,7 +57,7 @@ exports.SupportTickets = async (idUserToken) => {
                         attributes: ['museum_name']
                     },{
                         model: db.user,
-                        as: 'useruid',
+                        as: 'useru',
                         attributes: ['user_name']
                     }
                 ]
