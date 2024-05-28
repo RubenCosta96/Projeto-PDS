@@ -293,9 +293,9 @@ exports.getPieceByCollection = async (collectionName) => {
 	}
 };
 
-exports.getPieceByMuseum = async (museumName) => {
+exports.getPieceByMuseum = async (museumId) => {
     try{
-        let museum = await db.museum.findAll({ where: { museum_name: museumName } });
+        let museum = await db.museum.findAll({ where: { mid: museumId } });
 
         if (!museum) {
             throw new Error("Museu Inexistente!");

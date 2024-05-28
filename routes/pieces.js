@@ -16,7 +16,7 @@ router.get("/pieces/:category", piecesController.getPiecesByCategory);
 // List specific piece by collection
 router.get("/pieces/:collection", piecesController.getPiecesByCollection);
 // List pieces by museum
-router.get("/pieces/:museum", piecesController.getPiecesByMuseum);
+router.get("/pieces/museum/:id", piecesController.getPiecesByMuseum);
 // Add pieces
 router.post("/pieces/add", login.required, piecesController.addPieces);
 // Remove pieces

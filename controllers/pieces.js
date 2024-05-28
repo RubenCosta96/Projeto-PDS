@@ -67,9 +67,9 @@ exports.getPiecesByCollection = async (req, res) => {
 
 exports.getPiecesByMuseum = async (req, res) => {
     try {
-        let museumName = req.params.museumName;
+        let museum = req.params.museum;
 
-		let response = await services.getPieceByMuseum(museumName);
+		let response = await services.getPieceByMuseum(museum);
 
         return res.status(200).send(response);
     } catch (err) {
