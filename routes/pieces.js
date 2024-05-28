@@ -10,11 +10,11 @@ router.get("/pieces", piecesController.getPieces);
 // List specific piece by id
 router.get("/pieces/:id", piecesController.getPieceById);
 // List specific piece by name
-router.get("/pieces/:name", piecesController.getPiecesByName);
+router.get("/pieces/name/:name", piecesController.getPiecesByName);
 // List specific piece by category
-router.get("/pieces/:category", piecesController.getPiecesByCategory);
+router.get("/pieces/category/name/:category", piecesController.getPiecesByCategory);
 // List specific piece by collection
-router.get("/pieces/:collection", piecesController.getPiecesByCollection);
+router.get("/pieces/collection/name/:collection", piecesController.getPiecesByCollection);
 // List pieces by museum
 router.get("/pieces/museum/:id", piecesController.getPiecesByMuseum);
 // Add pieces
