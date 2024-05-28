@@ -47,7 +47,26 @@ exports.addPieces = async (name, artistId, collectionId, categoryId, museumId) =
 
 exports.getPieceById = async (id) => {
     try{
-        let piece = await db.piece.findByPk(id);
+        let piece = await db.piece.findOne({
+			where:{
+				pid:id
+		},
+		include: [{
+			model: db.artist,
+			as: 'artistum',
+			attributes: ['artist_name'],
+		}],
+		include: [{
+			model: db.collection,
+			as: 'collectionc',
+			attributes: ['collection_name'],
+		}],
+		include: [{
+			model: db.piece_category,
+			as: 'piece_categorypc',
+			attributes: ['pc_description'],
+		}],
+	});
 
 		if (!piece) {
 			throw new Error("Peça inexistente");
@@ -58,11 +77,13 @@ exports.getPieceById = async (id) => {
 			length: 1,
 			results: [{
 				id: piece.pid,
-					name: piece.piece_name,
-                    artist: piece.artistaid,
-                    collection: piece.collectioncid,
-                    category: piece.piece_categorypcid,
-                    museum: piece.museummid,
+				name: piece.piece_name,
+                artistid: piece.artistaid,
+				artistdescription: piece.artistum.artist_name,
+                collectionid: piece.collectioncid,
+				collectiondescription: piece.collectionc.collection_name,
+                categoryid: piece.piece_categorypcid,
+				categorydescription: piece.piece_categorypc.pc_description,
 			}],
 		};
         return response;
@@ -73,7 +94,23 @@ exports.getPieceById = async (id) => {
 
 exports.getPieces = async (id) => {
     try{
-        let pieces = await db.piece.findAll();
+        let pieces = await db.piece.findAll({
+		include: [{
+			model: db.artist,
+			as: 'artistum',
+			attributes: ['artist_name'],
+		}],
+		include: [{
+			model: db.collection,
+			as: 'collectionc',
+			attributes: ['collection_name'],
+		}],
+		include: [{
+			model: db.piece_category,
+			as: 'piece_categorypc',
+			attributes: ['pc_description'],
+		}],
+	});
 
 		if (pieces.length === 0) throw new Error("Não existem peças");
 
@@ -84,10 +121,12 @@ exports.getPieces = async (id) => {
 				return {
 					id: piece.pid,
 					name: piece.piece_name,
-                    artist: piece.artistaid,
-                    collection: piece.collectioncid,
-                    category: piece.piece_categorypcid,
-                    museum: piece.museummid,
+					artistid: piece.artistaid,
+					artistdescription: piece.artistum.artist_name,
+					collectionid: piece.collectioncid,
+					collectiondescription: piece.collectionc.collection_name,
+					categoryid: piece.piece_categorypcid,
+					categorydescription: piece.piece_categorypc.pc_description,
 				};
 			}),
 		};
@@ -99,7 +138,26 @@ exports.getPieces = async (id) => {
 
 exports.getPieceByName = async (name) => {
     try{
-        let pieces = await db.museum.findAll({ where: { piece_name: name } });
+        let pieces = await db.museum.findAll({ 
+			where: { 
+				piece_name: name 
+			},
+			include: [{
+				model: db.artist,
+				as: 'artistum',
+				attributes: ['artist_name'],
+			}],
+			include: [{
+				model: db.collection,
+				as: 'collectionc',
+				attributes: ['collection_name'],
+			}],
+			include: [{
+				model: db.piece_category,
+				as: 'piece_categorypc',
+				attributes: ['pc_description'],
+			}],
+		});
 
 		if (!pieces) {
 			throw new Error("Peça inexistente");
@@ -112,10 +170,12 @@ exports.getPieceByName = async (name) => {
 				return {
 					id: piece.pid,
 					name: piece.piece_name,
-                    artist: piece.artistaid,
-                    collection: piece.collectioncid,
-                    category: piece.piece_categorypcid,
-                    museum: piece.museummid,
+					artistid: piece.artistaid,
+					artistdescription: piece.artistum.artist_name,
+					collectionid: piece.collectioncid,
+					collectiondescription: piece.collectionc.collection_name,
+					categoryid: piece.piece_categorypcid,
+					categorydescription: piece.piece_categorypc.pc_description,
 				};
 			}),
 		};
@@ -133,7 +193,25 @@ exports.getPieceByCategory = async (categoryName) => {
 			throw new Error("Categoria Inexistente!");
         }
 
-        let pieces = await db.piece.findAll({ where: { piece_categorypcid: category.pcid } });
+        let pieces = await db.piece.findAll({ where: { 
+			piece_categorypcid: category.pcid 
+		},
+		include: [{
+			model: db.artist,
+			as: 'artistum',
+			attributes: ['artist_name'],
+		}],
+		include: [{
+			model: db.collection,
+			as: 'collectionc',
+			attributes: ['collection_name'],
+		}],
+		include: [{
+			model: db.piece_category,
+			as: 'piece_categorypc',
+			attributes: ['pc_description'],
+		}],
+	});
 
         if (!pieces) {
             throw new Error("Não há peças para esta categoria");
@@ -146,10 +224,12 @@ exports.getPieceByCategory = async (categoryName) => {
 				return {
 					id: piece.pid,
 					name: piece.piece_name,
-                    artist: piece.artistaid,
-                    collection: piece.collectioncid,
-                    category: piece.piece_categorypcid,
-                    museum: piece.museummid,
+					artistid: piece.artistaid,
+					artistdescription: piece.artistum.artist_name,
+					collectionid: piece.collectioncid,
+					collectiondescription: piece.collectionc.collection_name,
+					categoryid: piece.piece_categorypcid,
+					categorydescription: piece.piece_categorypc.pc_description,
 				};
 			}),
 		};
@@ -167,7 +247,25 @@ exports.getPieceByCollection = async (collectionName) => {
             throw new Error("Coleção Inexistente!");
         }
 
-        let pieces = await db.piece.findAll({ where: { collectioncid: collection.cid } });
+        let pieces = await db.piece.findAll({ where: {
+			 collectioncid: collection.cid 
+			},
+			include: [{
+				model: db.artist,
+				as: 'artistum',
+				attributes: ['artist_name'],
+			}],
+			include: [{
+				model: db.collection,
+				as: 'collectionc',
+				attributes: ['collection_name'],
+			}],
+			include: [{
+				model: db.piece_category,
+				as: 'piece_categorypc',
+				attributes: ['pc_description'],
+			}],
+		});
 
         if (!pieces) {
             throw new Error("Não há peças para esta coleção");
@@ -180,10 +278,66 @@ exports.getPieceByCollection = async (collectionName) => {
 				return {
 					id: piece.pid,
 					name: piece.piece_name,
-                    artist: piece.artistaid,
-                    collection: piece.collectioncid,
-                    category: piece.piece_categorypcid,
-                    museum: piece.museummid,
+					artistid: piece.artistaid,
+					artistdescription: piece.artistum.artist_name,
+					collectionid: piece.collectioncid,
+					collectiondescription: piece.collectionc.collection_name,
+					categoryid: piece.piece_categorypcid,
+					categorydescription: piece.piece_categorypc.pc_description,
+				};
+			}),
+		};
+        return response;
+    }catch (err) {
+		throw new Error(err);
+	}
+};
+
+exports.getPieceByMuseum = async (museumName) => {
+    try{
+        let museum = await db.museum.findAll({ where: { museum_name: museumName } });
+
+        if (!museum) {
+            throw new Error("Museu Inexistente!");
+        }
+
+        let pieces = await db.piece.findAll({ where: {
+			 collectioncid: collection.cid 
+			},
+			include: [{
+				model: db.artist,
+				as: 'artistum',
+				attributes: ['artist_name'],
+			}],
+			include: [{
+				model: db.collection,
+				as: 'collectionc',
+				attributes: ['collection_name'],
+			}],
+			include: [{
+				model: db.piece_category,
+				as: 'piece_categorypc',
+				attributes: ['pc_description'],
+			}],
+		});
+
+        if (!pieces) {
+            throw new Error("Não há peças para esta coleção");
+        }
+
+        let response = {
+			success: 1,
+			length: pieces.length,
+			results: pieces.map((piece) => {
+				return {
+					id: piece.pid,
+					name: piece.piece_name,
+					artistid: piece.artistaid,
+					artistdescription: piece.artistum.artist_name,
+					collectionid: piece.collectioncid,
+					collectiondescription: piece.collectionc.collection_name,
+					categoryid: piece.piece_categorypcid,
+					categorydescription: piece.piece_categorypc.pc_description,
 				};
 			}),
 		};
