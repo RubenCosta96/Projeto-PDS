@@ -3,6 +3,8 @@ const utils = require("../utils/index");
 
 exports.getTickets = async (idUserToken) => {
 	try {
+		let user = await utils.userType(idUserToken);
+
 		switch (user) {
 			case 1: //Admin
 				try {
@@ -58,6 +60,8 @@ exports.getTickets = async (idUserToken) => {
 
 exports.getTicketsByEvent = async (idUserToken, id) => {
 	try {
+		let user = await utils.userType(idUserToken);
+
 		switch (user) {
 			case 1: //Admin
 				try {

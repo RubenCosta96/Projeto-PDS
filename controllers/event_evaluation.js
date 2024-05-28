@@ -32,12 +32,6 @@ exports.getEventsEval = async (req, res) => {
 exports.getEventEval = async (req, res) => {
   try {
     let id = req.params.id;
-    /*
-      let idUserToken = req.user.id;
-  
-      let isAdmin = await utils.isAdmin(idUserToken);
-      if (!isAdmin && id != idUserToken) return res.status(403).send({ success: 0, message: "Sem permissão" });
-      */
 
     let event = await db.event.findByPk(id);
 
@@ -71,17 +65,6 @@ exports.addEventsEval = async (req, res) => {
   try {
     let { description, evaluation, user_id } = req.body;
 
-    /*
-      let isAdmin = await utils.isAdmin(idUserToken); //Verificar
-      if (!isAdmin && idOwner != idUserToken) {
-        return res.status(403).send({ success: 0, message: "Sem permissão" });
-      }
-  
-      let user = await db.user.findByPk(idOwner);
-      if (!user) {
-        return res.status(404).send({ success: 0, message: "Utilizador inexistente" });
-      }
-      */
     let newEventEval = await db.event_evaluation.create({
       ee_description: description,
       ee_evaluation: evaluation,
@@ -117,19 +100,10 @@ exports.editEventsEval = async (req, res) => {
       return res.status(404).send({ success: 0, message: "Utilizador inexistente" });
     }
 
-    /*
-      let idOwner = artist.id_user;
-  
-      let isAdmin = await utils.isAdmin(idUserToken); //Verificar
-      if (!isAdmin && idOwner != idUserToken) {
-        return res.status(403).send({ success: 0, message: "Sem permissão" });
-      }
-      */
-
-    if (id) event_evaluation.eventeeid = id;
-    if (description) event_evaluation.ee_description = description;
-    if (evaluation) event_evaluation.ee_evaluation = evaluation;
-    if (user_id) event_evaluation.useruid = user_id;
+    event_evaluation.eventeeid = id;
+    event_evaluation.ee_description = description;
+    event_evaluation.ee_evaluation = evaluation;
+    event_evaluation.useruid = user_id;
 
     await event_evaluation.save();
 

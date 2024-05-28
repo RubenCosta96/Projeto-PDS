@@ -1,9 +1,9 @@
 const db = require("../config/mysql");
 const utils = require("../utils/index");
-const services = require('../services/ads');
+const services = require('../Services/ads');
 
 exports.getAds = async (req, res) => {
-  try {
+  try {s
 
     let response = await services.getAds();
 
