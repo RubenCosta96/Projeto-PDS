@@ -1,21 +1,22 @@
 const db = require("../config/mysql");
 const utils = require("../utils/index");
 
-exports.getEventsStatus = async () =>{
+exports.getUsersStatus = async () =>{
     try{
-        let event_status = await db.event_status.findAll();
+        let status = await db.user_status.findAll();
 
-        if (event_status.length === 0) throw new Error("Não existem estados de eventos!");
+        if (status.length === 0)
+            return res.status(404).send({ success: 0, message: "Não existe nenhum estado de utilizador" });
 
         let response = {
-        success: 1,
-        length: event_status.length,
-        results: event_status.map((event_status) => {
+            success: 1,
+            length: status.length,
+            results: status.map((user_status) => {
             return {
-            id: event_status.es_id,
-            description: event_status.es_description,
+                id: user_status.us_id,
+                description: user_status.us_description,
             };
-        }),
+            }),
         };
 
         return response;
@@ -24,21 +25,22 @@ exports.getEventsStatus = async () =>{
 	}
 };
 
-exports.getEventStatus = async (id) =>{
+exports.getUserStatus = async (id) =>{
     try{
-        let event_status = await db.event_status.findByPk(id);
+        let result = await db.user_status.findByPk(id);
 
-        if (!event_status) throw new Error("Estado de evento inexistente!");
+        if (!result) {
+        return res
+            .status(404)
+            .send({ success: 0, message: "Estado inexistente" });
+        }
 
-        let response = {
+        let response = {    
         success: 1,
-        length: 1,
-        results: [
-            {
-            id: event_status.es_id,
-            description: event_status.es_description,
-            },
-        ],
+        results: {
+            id: result.us_id,
+            description: result.us_description,
+        },
         };
 
         return response;
@@ -47,16 +49,16 @@ exports.getEventStatus = async (id) =>{
 	}
 };
 
-exports.addEventStatus = async (idUserToken,description) =>{
+exports.addUserStatus = async (idUserToken,description) =>{
     try{
         let user = await utils.userType(idUserToken);
 
         switch (user) {
 			case 1: //Admin
 				try {
-					let newEventStatus = await db.event_status.create({
-                        es_description: description,
-                      });
+					let newUserStatus = await db.user_status.create({
+                        us_description: description,
+                    });
 				} catch (err) {
 					throw new Error(err);
 				}
@@ -71,8 +73,8 @@ exports.addEventStatus = async (idUserToken,description) =>{
 
         let response = {
             success: 1,
-            message: "Estado de evento criado com sucesso",
-        };
+            message: "Estado registado com sucesso",
+          };
 
         return response;
     }catch (err) {
@@ -80,22 +82,25 @@ exports.addEventStatus = async (idUserToken,description) =>{
     }
 };
 
-exports.editEventStatus = async (idUserToken,id,description) =>{
+exports.editUserStatus = async (idUserToken,id,description) =>{
     try{
         let user = await utils.userType(idUserToken);
 
         switch (user) {
 			case 1: //Admin
 				try {
-					let event_status = await db.event_status.findByPk(id);
+                    let status = await db.user_status.findByPk(id);
 
-                    if (!event_status) {
-                        throw new Error("Estado de evento inexistente!");
+                    if (!status) {
+                      return res
+                        .status(404)
+                        .send({ success: 0, message: "Estado inexistente" });
                     }
-
-                    event_status.es_description = description;
-
-                    await event_status.save();
+                
+                
+                    status.us_description = description;
+                
+                    await status.save();
 				} catch (err) {
 					throw new Error(err);
 				}
@@ -110,8 +115,8 @@ exports.editEventStatus = async (idUserToken,id,description) =>{
 
         let response = {
             success: 1,
-            message: "Estado de evento editado com sucesso",
-        };
+            message: "Estado editado com sucesso",
+          };
 
         return response;
     }catch (err) {
@@ -126,13 +131,16 @@ exports.removeEventStatus = async (idUserToken,id) =>{
         switch (user) {
 			case 1: //Admin
 				try {
-					let event_status = await db.event_status.findByPk(id);
+                    let status = await db.user_status.findByPk(id);
 
-                    if (!event_status) {
-                        throw new Error("Estado de evento inexistente!");
+                    if (!status) {
+                    return res
+                        .status(404)
+                        .send({ success: 0, message: "Estado inexistente" });
                     }
 
-                    await event_status.destroy();
+
+                    await status.destroy();
 				} catch (err) {
 					throw new Error(err);
 				}
@@ -147,7 +155,7 @@ exports.removeEventStatus = async (idUserToken,id) =>{
 
         let response = {
             success: 1,
-            message: "Estado de evento removido com sucesso",
+            message: "Estado removido com sucesso",
           };
 
         return response;

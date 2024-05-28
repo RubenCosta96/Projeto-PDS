@@ -1,21 +1,22 @@
 const db = require("../config/mysql");
 const utils = require("../utils/index");
 
-exports.getEventsStatus = async () =>{
+exports.getUsersType = async () =>{
     try{
-        let event_status = await db.event_status.findAll();
+        let type = await db.user_type.findAll();
 
-        if (event_status.length === 0) throw new Error("Não existem estados de eventos!");
+        if (type.length === 0)
+            return res.status(404).send({ success: 0, message: "Não existe nenhum tipo de utilizador" });
 
         let response = {
-        success: 1,
-        length: event_status.length,
-        results: event_status.map((event_status) => {
+            success: 1,
+            length: type.length,
+            results: type.map((user_type) => {
             return {
-            id: event_status.es_id,
-            description: event_status.es_description,
+                id: user_type.utid,
+                description: user_status.ut_description,
             };
-        }),
+            }),
         };
 
         return response;
@@ -24,21 +25,22 @@ exports.getEventsStatus = async () =>{
 	}
 };
 
-exports.getEventStatus = async (id) =>{
+exports.getUserType = async (id) =>{
     try{
-        let event_status = await db.event_status.findByPk(id);
+        let result = await db.user_type.findByPk(id);
 
-        if (!event_status) throw new Error("Estado de evento inexistente!");
-
-        let response = {
-        success: 1,
-        length: 1,
-        results: [
-            {
-            id: event_status.es_id,
-            description: event_status.es_description,
-            },
-        ],
+        if (!result) {
+          return res
+            .status(404)
+            .send({ success: 0, message: "Tipo de utilizador inexistente" });
+        }
+    
+        let response = {    
+          success: 1,
+          results: {
+            id: result.us_id,
+            description: result.us_description,
+          },
         };
 
         return response;
@@ -47,16 +49,16 @@ exports.getEventStatus = async (id) =>{
 	}
 };
 
-exports.addEventStatus = async (idUserToken,description) =>{
+exports.addUserType = async (idUserToken,description) =>{
     try{
         let user = await utils.userType(idUserToken);
 
         switch (user) {
 			case 1: //Admin
 				try {
-					let newEventStatus = await db.event_status.create({
-                        es_description: description,
-                      });
+					let newUserType = await db.user_type.create({
+                        ut_description: description,
+                    });
 				} catch (err) {
 					throw new Error(err);
 				}
@@ -71,8 +73,8 @@ exports.addEventStatus = async (idUserToken,description) =>{
 
         let response = {
             success: 1,
-            message: "Estado de evento criado com sucesso",
-        };
+            message: "Tipo de utilizador registado com sucesso",
+          };
 
         return response;
     }catch (err) {
@@ -80,22 +82,24 @@ exports.addEventStatus = async (idUserToken,description) =>{
     }
 };
 
-exports.editEventStatus = async (idUserToken,id,description) =>{
+exports.editUserType = async (idUserToken,id,description) =>{
     try{
         let user = await utils.userType(idUserToken);
 
         switch (user) {
 			case 1: //Admin
 				try {
-					let event_status = await db.event_status.findByPk(id);
+					let type = await db.user_type.findByPk(id);
 
-                    if (!event_status) {
-                        throw new Error("Estado de evento inexistente!");
+                    if (!type) {
+                    return res
+                        .status(404)
+                        .send({ success: 0, message: "Tipo de utilizador inexistente" });
                     }
 
-                    event_status.es_description = description;
+                    type.ut_description = description;
 
-                    await event_status.save();
+                    await type.save();
 				} catch (err) {
 					throw new Error(err);
 				}
@@ -110,8 +114,8 @@ exports.editEventStatus = async (idUserToken,id,description) =>{
 
         let response = {
             success: 1,
-            message: "Estado de evento editado com sucesso",
-        };
+            message: "Tipo de utilizador editado com sucesso",
+          };
 
         return response;
     }catch (err) {
@@ -119,20 +123,22 @@ exports.editEventStatus = async (idUserToken,id,description) =>{
     }
 };
 
-exports.removeEventStatus = async (idUserToken,id) =>{
+exports.removeEventType = async (idUserToken,id) =>{
     try{
         let user = await utils.userType(idUserToken);
 
         switch (user) {
 			case 1: //Admin
 				try {
-					let event_status = await db.event_status.findByPk(id);
+                    let type = await db.user_type.findByPk(id);
 
-                    if (!event_status) {
-                        throw new Error("Estado de evento inexistente!");
+                    if (!type) {
+                      return res
+                        .status(404)
+                        .send({ success: 0, message: "Tipo de utilizador inexistente" });
                     }
-
-                    await event_status.destroy();
+                
+                    await type.destroy();
 				} catch (err) {
 					throw new Error(err);
 				}
@@ -147,7 +153,7 @@ exports.removeEventStatus = async (idUserToken,id) =>{
 
         let response = {
             success: 1,
-            message: "Estado de evento removido com sucesso",
+            message: "Tipo de utilizador removido com sucesso",
           };
 
         return response;
