@@ -340,7 +340,7 @@ exports.approveMuseum = async (idUserToken,id) =>{
 						throw new Error("Museu já aprovado!");
 					}
 
-					museum.approved = 1;
+					museum.state = 1;
 					await museum.save();
 				} catch (err) {
 					throw new Error(err);
