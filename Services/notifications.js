@@ -6,7 +6,7 @@ exports.getUnreadNotifications = async (idUserToken) =>{
         let notifications = await db.notification.findAll({ where: { useruid: idUserToken, notification_statensid: 1 }});
 
         if (notifications.lenght === 0) {
-			return res.status(404).send({ success: 0, message: "Não existem notificações por ler" });
+            throw new Error("Não existem notificações por ler!");
 		}
 
         let response = {
@@ -33,7 +33,7 @@ exports.getReadNotifications = async (idUserToken) =>{
         let notifications = await db.notification.findAll({ where: { useruid: idUserToken, notification_statensid: 2 }});
 
         if (notifications.length === 0) {
-			return res.status(404).send({ success: 0, message: "Não existem notificações" });
+            throw new Error("Não existem notificações!");
 		}
 
         let response = {
@@ -61,7 +61,7 @@ exports.getAllNotifications = async (idUserToken) =>{
         let notifications = await db.notification.findAll({ where: { useruid: idUserToken }});
 
         if (notifications.lenght === 0) {
-			return res.status(404).send({ success: 0, message: "Não existem notificações" });
+            throw new Error("Não existem notificações!");
 		}
 
         let response = {
@@ -137,7 +137,7 @@ exports.informImproperConduct = async (idUserToken,userId,description,type) =>{
 			case 1: //Admin
 				try {
 					let user = await db.user.findByPk(id);
-                    if (!user) return res.status(404).send({ success: 0, message: 'Utilizador inexistente' });
+                    if (!user) throw new Error("Não existem notificações!");
 
                     let newNotification = await db.notification.create({
                         n_description: description,

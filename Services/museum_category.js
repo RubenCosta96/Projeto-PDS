@@ -5,7 +5,8 @@ exports.getMuseumCategories = async () =>{
     try{
         let museum_category = await db.museum_category.findAll();
 
-        if (museum_category.length === 0) return res.status(404).send({ success: 0, message: "Não existem categorias de museu" });
+        if (museum_category.length === 0) 
+            throw new Error("Não existem categorias de museu!");
 
         let response = {
         success: 1,
@@ -27,7 +28,8 @@ exports.getMuseumCategory = async (id) =>{
     try{
         let museum_category = await db.museum_category.findByPk(id);
 
-        if (!museum_category) return res.status(404).send({ success: 0, message: "Categoria inexistente" });
+        if (!museum_category)
+            throw new Error("Categoria inexistente!");
 
         let response = {
         success: 1,
@@ -89,7 +91,7 @@ exports.editMuseumCategory = async (idUserToken,id,description) =>{
                     let museum_category = await db.museum_category.findByPk(id);
 
                     if (!museum_category) {
-                      return res.status(404).send({ success: 0, message: "Categoria inexistente" });
+                        throw new Error("Categoria inexistente!");
                     }
                 
                     museum_category.mc_description = description;
@@ -128,7 +130,7 @@ exports.removeMuseumCategory = async (idUserToken,id) =>{
                     let museum_category = await db.museum_category.findByPk(id);
 
                     if (!museum_category) {
-                    return res.status(404).send({ success: 0, message: "Categoria inexistente" });
+                        throw new Error("Categoria inexistente!");
                     }
 
                     await museum_category.destroy();

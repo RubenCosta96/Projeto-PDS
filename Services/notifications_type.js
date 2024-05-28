@@ -6,7 +6,7 @@ exports.getNotificationTypes = async () =>{
         let notificationTypes = await db.notification_type.findAll();
 
         if (notificationTypes.length === 0) {
-        return res.status(404).send({ success: 0, message: "Não existem tipos de notificação" });
+            throw new Error("Não existem tipos de notificação!");
         }
 
         let response = {
@@ -30,7 +30,7 @@ exports.getNotificationType = async (id) =>{
         let notificationType = await db.notification_type.findByPk(id);
 
         if (!notificationType) {
-          return res.status(404).send({ success: 0, message: "Tipo de notificação inexistente" });
+            throw new Error("Não existem tipos de notificação!");
         }
     
         let response = {
@@ -93,7 +93,7 @@ exports.editNotificationType = async (idUserToken,id,description) =>{
                     let notificationType = await db.notification_type.findByPk(id);
 
                     if (!notificationType) {
-                    return res.status(404).send({ success: 0, message: "Tipo de notificação inexistente" });
+                        throw new Error("Tipo de notificação inexistente!");
                     }
 
                     notificationType.nt_description = description;
@@ -131,7 +131,7 @@ exports.removeNotificationType = async (idUserToken,id) =>{
                     let notificationType = await db.notification_type.findByPk(id);
 
                     if (!notificationType) {
-                    return res.status(404).send({ success: 0, message: "Tipo de notificação inexistente" });
+                        throw new Error("Tipo de notificação inexistente!");
                     }
 
                     await notificationType.destroy();

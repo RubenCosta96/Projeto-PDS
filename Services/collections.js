@@ -90,7 +90,7 @@ exports.editCollection = async (idUserToken,name) =>{
                     let collection = await db.collection.findByPk(id);
 
                     if (!collection) {
-                      return res.status(404).send({ success: 0, message: "Coleção inexistente" });
+                        throw new Error("Coleção inexistente!");
                     }
                 
                     collection.collection_name = name;
@@ -129,7 +129,7 @@ exports.removeCollection = async (idUserToken,id) =>{
                     let collection = await db.collection.findByPk(id);
 
                     if (!collection) {
-                      return res.status(404).send({ success: 0, message: "Coleção inexistente" });
+                        throw new Error("Coleção inexistente!");
                     }
                 
                     await collection.destroy();

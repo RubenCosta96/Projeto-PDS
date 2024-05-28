@@ -6,7 +6,7 @@ exports.getUsersStatus = async () =>{
         let status = await db.user_status.findAll();
 
         if (status.length === 0)
-            return res.status(404).send({ success: 0, message: "Não existe nenhum estado de utilizador" });
+            throw new Error("Não existe nenhum estado de utilizador");
 
         let response = {
             success: 1,

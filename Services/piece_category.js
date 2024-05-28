@@ -6,7 +6,7 @@ exports.getPieceCategories = async () =>{
         let pieceCategories = await db.piece_category.findAll();
 
         if (pieceCategories.length === 0) {
-        return res.status(404).send({ success: 0, message: "Não existem categorias de peças" });
+            throw new Error("Não existem categorias de peças");
         }
 
         let response = {
@@ -30,7 +30,7 @@ exports.getPieceCategory = async (id) =>{
         let pieceCategory = await db.piece_category.findByPk(id);
 
         if (!pieceCategory) {
-        return res.status(404).send({ success: 0, message: "Categoria de peça inexistente" });
+            throw new Error("Categoria de peça inexistente");
         }
 
         let response = {
@@ -92,7 +92,7 @@ exports.editPieceCategory = async (idUserToken,id,description) =>{
                     let pieceCategory = await db.piece_category.findByPk(id);
 
                     if (!pieceCategory) {
-                    return res.status(404).send({ success: 0, message: "Categoria de peça inexistente" });
+                        throw new Error("Categoria de peça inexistente");
                     }
 
                     pieceCategory.pc_description = description;
@@ -131,7 +131,7 @@ exports.removePieceCategory = async (idUserToken,id) =>{
                     let pieceCategory = await db.piece_category.findByPk(id);
 
                     if (!pieceCategory) {
-                      return res.status(404).send({ success: 0, message: "Categoria de peça inexistente" });
+                        throw new Error("Categoria de peça inexistente");
                     }
                 
                     await pieceCategory.destroy();

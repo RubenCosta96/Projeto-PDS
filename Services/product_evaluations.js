@@ -6,7 +6,7 @@ exports.getAllEvaluations = async () =>{
         let evaluations = await db.product_evaluation.findAll();
 
         if (evaluations.length === 0)
-            return res.status(404).send({ success: 0, message: "Não existe nenhuma avaliaçao" });
+            throw new Error("Não existe nenhuma avaliaçao");
 
         let response = {
             success: 1,
@@ -36,7 +36,7 @@ exports.getEvaluationsByUser = async (id) =>{
         });
   
         if (evaluations.length === 0)
-            return res.status(404).send({ success: 0, message: "Não existem avaliaçoes realizadas por esse utilzador" });
+            throw new Error("Não existem avaliaçoes realizadas por esse utilzador");
   
         let response = {
             success: 1,
@@ -66,7 +66,7 @@ exports.getEvaluationsByProduct = async (id) =>{
         });
     
         if (evaluations.length === 0)
-            return res.status(404).send({ success: 0, message: "Não existem avaliaçoes realizadas por esse produto" });
+            throw new Error("Não existem avaliaçoes realizadas por esse produto");
     
         let response = {
             success: 1,

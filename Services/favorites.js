@@ -120,10 +120,7 @@ exports.removeFavorite = async (idUserToken, id) => {
                     });
 
                     if (!favorite) {
-                        return res.status(404).send({
-                            success: 0,
-                            message: "Favorito inexistente",
-                        });
+                        throw new Error("Favorito inexistente");
                     }
 
                     await favorite.destroy();
@@ -141,10 +138,7 @@ exports.removeFavorite = async (idUserToken, id) => {
                     });
 
                     if (!favorite) {
-                        return res.status(404).send({
-                            success: 0,
-                            message: "Favorito inexistente",
-                        });
+                        throw new Error("Favorito inexistente");
                     }
 
                     await favorite.destroy();
@@ -162,10 +156,7 @@ exports.removeFavorite = async (idUserToken, id) => {
                     });
 
                     if (!favorite) {
-                        return res.status(404).send({
-                            success: 0,
-                            message: "Favorito inexistente",
-                        });
+                        throw new Error("Favorito inexistente");
                     }
 
                     await favorite.destroy();

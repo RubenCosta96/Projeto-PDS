@@ -6,10 +6,7 @@ exports.getAllSupportStates = async () => {
         let states = await db.support_state.findAll();
 
         if (states.length === 0)
-            return res.status(404).send({
-                success: 0,
-                message: "Não existem estados de suporte",
-            });
+            throw new Error("Não existem estados de suporte",);
 
         let response = {
             success: 1,
@@ -97,10 +94,7 @@ exports.removeSupportState = async (idUserToken, id) => {
                     let state = await db.support_state.findByPk(id);
 
                     if (!state) {
-                        return res.status(404).send({
-                            success: 0,
-                            message: "Estado inexistente",
-                        });
+                        throw new Error("Estado inexistente");
                     }
 
                     await state.destroy();
@@ -136,10 +130,7 @@ exports.editSupportState = async (idUserToken, id, description) => {
                 try {
                     let state = await db.support_state.findByPk(id);
                     if (!state) {
-                        return res.status(404).send({
-                            success: 0,
-                            message: "Estado inexistente",
-                        });
+                        throw new Error("Estado inexistente");
                     }
                     state.description = description;
                     await state.save();

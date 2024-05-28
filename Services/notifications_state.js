@@ -6,7 +6,7 @@ exports.getNotificationStates = async () =>{
         let notificationStates = await db.notification_state.findAll();
 
         if (notificationStates.length === 0) {
-        return res.status(404).send({ success: 0, message: "Não existem estados de notificação" });
+            throw new Error("Não existem estados de notificação!");
         }
 
         let response = {
@@ -31,7 +31,7 @@ exports.getNotificationState = async (id) =>{
         let notificationState = await db.notification_state.findByPk(id);
 
         if (!notificationState) {
-        return res.status(404).send({ success: 0, message: "Estado de notificação inexistente" });
+            throw new Error("Estado de notificação inexistente!");
         }
 
         let response = {
@@ -92,7 +92,7 @@ exports.editNotificationState = async (idUserToken,id,description) =>{
                     let notificationState = await db.notification_state.findByPk(id);
 
                     if (!notificationState) {
-                    return res.status(404).send({ success: 0, message: "Estado de notificação inexistente" });
+                        throw new Error("Estado de notificação inexistente!");
                     }
 
                     notificationState.ns_description = description;
@@ -130,7 +130,7 @@ exports.removeNotificationState = async (idUserToken,id) =>{
                     let notificationState = await db.notification_state.findByPk(id);
 
                     if (!notificationState) {
-                    return res.status(404).send({ success: 0, message: "Estado de notificação inexistente" });
+                        throw new Error("Estado de notificação inexistente!");
                     }
 
                     await notificationState.destroy();

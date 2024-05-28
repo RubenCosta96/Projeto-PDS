@@ -132,10 +132,7 @@ exports.editTicketStatus = async (idUserToken, id, description) => {
                     let status = await db.ticket_status.findByPk(id);
 
                     if (!status)
-                        return res.status(404).send({
-                            success: 0,
-                            message: "Status inexistente",
-                        });
+                        throw new Error("Status inexistente"); 
 
                     status.desc_ticket_status = description;
 

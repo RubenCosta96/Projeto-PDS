@@ -60,7 +60,7 @@ exports.getEventByMuseum = async (id) => {
 	try {
 		let event = await db.event.findAll({ where: { museummid: id } });
 
-		if (event.length === 0) return res.status(404).send({ success: 0, message: "Não existem eventos para este museu." });
+		if (event.length === 0) throw new Error("Não existem eventos para este museu.");
 
 		let response = {
 			success: 1,
@@ -93,7 +93,7 @@ exports.editEvent = async (id, idUserToken, start_date, end_date, type,status, p
 			case 2: //Manager
 				try {
 					if (!event) {
-						return res.status(404).send({ success: 0, message: "Evento inexistente" });
+						throw new Error("Evento inexistente!");
 					}
 
 					let museum = await db.usermuseum.findOne({
@@ -103,7 +103,7 @@ exports.editEvent = async (id, idUserToken, start_date, end_date, type,status, p
 					});
 
 					if (event.museummid != museum.museummid) {
-						return res.status(403).send({ success: 0, message: "Sem permissão" });
+						throw new Error("Sem permissão!");
 					}
 
 					event.event_start_date = start_date;
@@ -228,11 +228,11 @@ exports.editPriceEvent = async (idUserToken, EventId, price) => {
 					let event = await db.event.findByPk(eventId);
 
 					if (!event) {
-						return res.status(404).send({ success: 0, message: "Evento inexistente" });
+						throw new Error("Evento inexistente!");
 					}
 
 					if (event.museummid !== manager.museummid) {
-						return res.status(403).send({ success: 0, message: "Ticket não pertence ao seu museu" });
+						throw new Error("Ticket não pertence ao seu museu!");
 					}
 
 					event.event_price = price;
