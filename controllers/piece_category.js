@@ -1,23 +1,11 @@
 const db = require("../config/mysql");
 const utils = require('../utils/index');
+const services = require("../Services/piece_category");
 
 exports.getPieceCategories = async (req, res) => {
   try {
-    let pieceCategories = await db.piece_category.findAll();
-
-    if (pieceCategories.length === 0) {
-      return res.status(404).send({ success: 0, message: "Não existem categorias de peças" });
-    }
-
-    let response = {
-      success: 1,
-      length: pieceCategories.length,
-      results: pieceCategories.map((pieceCategory) => {
-        return {
-          description: pieceCategory.pc_description,
-        };
-      }),
-    };
+    
+    let response = await services.getPieceCategories();
 
     return res.status(200).send(response);
   } catch (err) {
@@ -29,21 +17,7 @@ exports.getPieceCategory = async (req, res) => {
   try {
     let id = req.params.id;
 
-    let pieceCategory = await db.piece_category.findByPk(id);
-
-    if (!pieceCategory) {
-      return res.status(404).send({ success: 0, message: "Categoria de peça inexistente" });
-    }
-
-    let response = {
-      success: 1,
-      length: 1,
-      results: [
-        {
-          description: pieceCategory.pc_description,
-        },
-      ],
-    };
+    let response = await services.getPieceCategory(id);
 
     return res.status(200).send(response);
   } catch (err) {
@@ -54,15 +28,9 @@ exports.getPieceCategory = async (req, res) => {
 exports.addPieceCategory = async (req, res) => {
   try {
     let { description } = req.body;
+    let idUserToken = req.user.id;
 
-    let newPieceCategory = await db.piece_category.create({
-      pc_description: description,
-    });
-
-    let response = {
-      success: 1,
-      message: "Categoria de peça criada com sucesso",
-    };
+    let response = await services.addPieceCategory(idUserToken, description);
 
     return res.status(200).send(response);
   } catch (err) {
@@ -75,22 +43,9 @@ exports.editPieceCategory = async (req, res) => {
   try {
     let id = req.params.id;
     let { description } = req.body;
+    let idUserToken = req.user.id;
 
-    let pieceCategory = await db.piece_category.findByPk(id);
-
-    if (!pieceCategory) {
-      return res.status(404).send({ success: 0, message: "Categoria de peça inexistente" });
-    }
-
-    if (description) {
-      pieceCategory.pc_description = description;
-      await pieceCategory.save();
-    }
-
-    let response = {
-      success: 1,
-      message: "Categoria de peça editada com sucesso",
-    };
+    let response = await services.editPieceCategory(idUserToken, id);
 
     return res.status(200).send(response);
   } catch (err) {
@@ -102,19 +57,9 @@ exports.editPieceCategory = async (req, res) => {
 exports.removePieceCategory = async (req, res) => {
   try {
     let id = req.params.id;
+    let idUserToken = req.user.id;
 
-    const pieceCategory = await db.piece_category.findByPk(id);
-
-    if (!pieceCategory) {
-      return res.status(404).send({ success: 0, message: "Categoria de peça inexistente" });
-    }
-
-    await pieceCategory.destroy();
-
-    let response = {
-      success: 1,
-      message: "Categoria de peça removida com sucesso",
-    };
+    let response = await services.removePieceCategory(idUserToken, id);
 
     return res.status(200).send(response);
   } catch (err) {

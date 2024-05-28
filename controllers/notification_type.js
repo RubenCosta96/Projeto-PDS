@@ -1,23 +1,11 @@
 const db = require("../config/mysql");
 const utils = require('../utils/index');
+const services = require("../Services/notifications_type");
 
 exports.getNotificationTypes = async (req, res) => {
   try {
-    let notificationTypes = await db.notification_type.findAll();
 
-    if (notificationTypes.length === 0) {
-      return res.status(404).send({ success: 0, message: "Não existem tipos de notificação" });
-    }
-
-    let response = {
-      success: 1,
-      length: notificationTypes.length,
-      results: notificationTypes.map((notificationType) => {
-        return {
-          description: notificationType.nt_description,
-        };
-      }),
-    };
+    let response = await services.getNotificationTypes();
 
     return res.status(200).send(response);
   } catch (err) {
@@ -29,21 +17,7 @@ exports.getNotificationType = async (req, res) => {
   try {
     let id = req.params.id;
 
-    let notificationType = await db.notification_type.findByPk(id);
-
-    if (!notificationType) {
-      return res.status(404).send({ success: 0, message: "Tipo de notificação inexistente" });
-    }
-
-    let response = {
-      success: 1,
-      length: 1,
-      results: [
-        {
-          description: notificationType.nt_description,
-        },
-      ],
-    };
+    let response = await services.getNotificationType(id);
 
     return res.status(200).send(response);
   } catch (err) {
@@ -54,15 +28,9 @@ exports.getNotificationType = async (req, res) => {
 exports.addNotificationType = async (req, res) => {
   try {
     let { description } = req.body;
+    let idUserToken = req.user.id;
 
-    let newNotificationType = await db.notification_type.create({
-      nt_description: description,
-    });
-
-    let response = {
-      success: 1,
-      message: "Tipo de notificação criado com sucesso",
-    };
+    let response = await services.addNotificationType(idUserToken,description);
 
     return res.status(200).send(response);
   } catch (err) {
@@ -75,22 +43,9 @@ exports.editNotificationType = async (req, res) => {
   try {
     let id = req.params.id;
     let { description } = req.body;
-
-    let notificationType = await db.notification_type.findByPk(id);
-
-    if (!notificationType) {
-      return res.status(404).send({ success: 0, message: "Tipo de notificação inexistente" });
-    }
-
-    if (description) {
-      notificationType.nt_description = description;
-      await notificationType.save();
-    }
-
-    let response = {
-      success: 1,
-      message: "Tipo de notificação editado com sucesso",
-    };
+    let idUserToken = req.user.id;
+   
+    let response = await services.editNotificationType(idUserToken, id, description);
 
     return res.status(200).send(response);
   } catch (err) {
@@ -102,19 +57,9 @@ exports.editNotificationType = async (req, res) => {
 exports.removeNotificationType = async (req, res) => {
   try {
     let id = req.params.id;
+    let idUserToken = req.user.id;
 
-    const notificationType = await db.notification_type.findByPk(id);
-
-    if (!notificationType) {
-      return res.status(404).send({ success: 0, message: "Tipo de notificação inexistente" });
-    }
-
-    await notificationType.destroy();
-
-    let response = {
-      success: 1,
-      message: "Tipo de notificação removido com sucesso",
-    };
+    let response = await services.removeNotificationType(idUserToken, id);
 
     return res.status(200).send(response);
   } catch (err) {
