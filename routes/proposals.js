@@ -29,13 +29,6 @@ router.put("/proposals/accept/:id", login.required, ProposalController.acceptPro
 // reject proposal
 router.put("/proposals/reject/:id", login.required, ProposalController.rejectProposal);
 
-// reject proposal
-router.put("/proposals/confirm/:id", login.required, ProposalController.confirmProposal);
-
-// reject proposal
-router.put("/proposals/cancel/:id", login.required, ProposalController.cancelProposal);
-
-//ProposalState
 
 // list All porposals States
 router.get("/proposals/states",login.required, ProposalStatesController.getAllProposalStates);

@@ -15,7 +15,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: false
     },
-    premium: {
+    state: {
       type: DataTypes.INTEGER,
       allowNull: true
     },
@@ -46,7 +46,7 @@ module.exports = function(sequelize, DataTypes) {
     timestamps: false,
     indexes: [
       {
-        name: "PK__museum__DF5032ECC3D2AAD6",
+        name: "PK__museum__DF5032EC5C05409C",
         unique: true,
         fields: [
           { name: "mid" },
