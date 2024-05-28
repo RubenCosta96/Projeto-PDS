@@ -45,6 +45,6 @@ router.post("/users/type/add", login.required, UserTypeController.addUserType);
 // Edit type
 router.put("/users/type/edit/:id", login.required, UserTypeController.editUserType);
 // Remove type
-router.delete("/users/type/remove/:id", login.required, UserTypeController.removeUserState);
+router.delete("/users/type/remove/:id", login.required, UserTypeController.removeUserType);
 
 module.exports = router;

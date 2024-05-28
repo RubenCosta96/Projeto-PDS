@@ -1,21 +1,21 @@
 const db = require("../config/mysql");
 const utils = require("../utils/index");
 
-exports.getEventsStatus = async () =>{
+exports.getEventsType = async () =>{
     try{
-        let event_status = await db.event_status.findAll();
+        let event_type = await db.event_type.findAll();
 
-        if (event_status.length === 0) throw new Error("Não existem estados de eventos!");
-
+        if (event_type.length === 0) throw new Error("Não existem tipos de evento!");
+    
         let response = {
-        success: 1,
-        length: event_status.length,
-        results: event_status.map((event_status) => {
+          success: 1,
+          length: event_type.length,
+          results: event_type.map((event_type) => {
             return {
-            id: event_status.es_id,
-            description: event_status.es_description,
+              id: event_type.etid,
+              description: event_type.et_description,
             };
-        }),
+          }),
         };
 
         return response;
@@ -24,19 +24,19 @@ exports.getEventsStatus = async () =>{
 	}
 };
 
-exports.getEventStatus = async (id) =>{
+exports.getEventType = async (id) =>{
     try{
-        let event_status = await db.event_status.findByPk(id);
+        let event_type = await db.event_type.findByPk(id);
 
-        if (!event_status) throw new Error("Estado de evento inexistente!");
+        if (!event_type) throw new Error("Tipo de evento inexistente!");
 
         let response = {
         success: 1,
         length: 1,
         results: [
             {
-            id: event_status.es_id,
-            description: event_status.es_description,
+            id: event_type.etid,
+            description: event_type.et_description,
             },
         ],
         };
@@ -47,15 +47,15 @@ exports.getEventStatus = async (id) =>{
 	}
 };
 
-exports.addEventStatus = async (idUserToken,description) =>{
+exports.addEventType = async (idUserToken,description) =>{
     try{
         let user = await utils.userType(idUserToken);
 
         switch (user) {
 			case 1: //Admin
 				try {
-					let newEventStatus = await db.event_status.create({
-                        es_description: description,
+					let newEventType = await db.event_type.create({
+                        et_description: description,
                       });
 				} catch (err) {
 					throw new Error(err);
@@ -71,8 +71,8 @@ exports.addEventStatus = async (idUserToken,description) =>{
 
         let response = {
             success: 1,
-            message: "Estado de evento criado com sucesso",
-        };
+            message: "Tipo de evento criado com sucesso",
+          };
 
         return response;
     }catch (err) {
@@ -80,22 +80,22 @@ exports.addEventStatus = async (idUserToken,description) =>{
     }
 };
 
-exports.editEventStatus = async (idUserToken,id,description) =>{
+exports.editEventType = async (idUserToken,id,description) =>{
     try{
         let user = await utils.userType(idUserToken);
 
         switch (user) {
 			case 1: //Admin
 				try {
-					let event_status = await db.event_status.findByPk(id);
+					let event_type = await db.event_type.findByPk(id);
 
-                    if (!event_status) {
-                        throw new Error("Estado de evento inexistente!");
+                    if (!event_type) {
+                        throw new Error("Tipo de evento inexistente!");
                     }
+                    
+                    event_type.et_description = description;
 
-                    event_status.es_description = description;
-
-                    await event_status.save();
+                    await event_type.save();
 				} catch (err) {
 					throw new Error(err);
 				}
@@ -110,8 +110,8 @@ exports.editEventStatus = async (idUserToken,id,description) =>{
 
         let response = {
             success: 1,
-            message: "Estado de evento editado com sucesso",
-        };
+            message: "Tipo de evento editado com sucesso",
+          };
 
         return response;
     }catch (err) {
@@ -119,20 +119,19 @@ exports.editEventStatus = async (idUserToken,id,description) =>{
     }
 };
 
-exports.removeEventStatus = async (idUserToken,id) =>{
+exports.removeEventType = async (idUserToken,id) =>{
     try{
         let user = await utils.userType(idUserToken);
 
         switch (user) {
 			case 1: //Admin
 				try {
-					let event_status = await db.event_status.findByPk(id);
+					let event_type = await db.event_type.findByPk(id);
 
-                    if (!event_status) {
-                        throw new Error("Estado de evento inexistente!");
+                    if (!event_type) {
+                        throw new Error("Tipo de evento inexistente!");
                     }
-
-                    await event_status.destroy();
+                    await event_type.destroy();
 				} catch (err) {
 					throw new Error(err);
 				}
@@ -147,7 +146,7 @@ exports.removeEventStatus = async (idUserToken,id) =>{
 
         let response = {
             success: 1,
-            message: "Estado de evento removido com sucesso",
+            message: "Tipo de evento removido com sucesso",
           };
 
         return response;
