@@ -213,7 +213,13 @@ exports.acceptProposal = async (req, res) => {
     let id = req.params.id;
     let idUserToken = req.user.id;
 
-    const result = await db.proposal.findByPk(id);
+    const result = await db.proposal.findByPk(id,{
+      include:[{
+        model: db.ad,
+        as: "adad",
+        attributes: ["adid"]
+      }]
+    });
 
     if (!result) {
       return res
@@ -221,11 +227,7 @@ exports.acceptProposal = async (req, res) => {
         .send({ success: 0, message: "proposta inexistente" });
     }
 
-    const ad = await db.ad.findOne({
-      where:{
-        useruid: idUserToken,
-      }
-    });
+    const ad = await db.ad.findByPk(result.adad.adid);
 
     if(!ad){
       return res
@@ -246,7 +248,6 @@ exports.acceptProposal = async (req, res) => {
 
     return res.status(200).send(response);
   } catch (err) {
-    console.error("Error accepting proposal:", err);
     return res.status(500).send({ error: err, message: err.message });
   }
 };

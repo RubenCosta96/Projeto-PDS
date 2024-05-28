@@ -71,7 +71,7 @@ exports.editMuseum = async (req, res) => {
 	try {
 		let id = req.params.id;
 		let idUserToken = req.user.id;
-		let { name, address, category, zip_code } = req.body;
+		let { name, address, category, zip_code, zip_ext } = req.body;
 
 		let response = await services.editMuseum(idUserToken, id, name, address, zip_ext, category, zip_code );
 
