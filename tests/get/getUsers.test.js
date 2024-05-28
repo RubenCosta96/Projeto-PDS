@@ -1,89 +1,91 @@
-const { getUsers } = require("../../controllers/users");
+const services = require("../../Services/users");
 const db = require("../../config/mysql");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const utils = require("../../utils/index");
 
 jest.mock("../../config/mysql");
-jest.mock("bcrypt");
-jest.mock("jsonwebtoken");
 jest.mock("../../utils/index");
 
-describe("Get Users Function", () => {
-    let req, res;
+describe("getUsers", () => {
+    let findAllMock;
+    let userTypeMock;
 
     beforeEach(() => {
-        req = {
-            user: { id: 1 },
-        };
-        res = {
-            status: jest.fn().mockReturnThis(),
-            send: jest.fn(),
-        };
+        findAllMock = jest.fn();
+        db.user.findAll = findAllMock;
+
+        userTypeMock = jest.fn();
+        utils.userType = userTypeMock;
     });
 
     afterEach(() => {
         jest.clearAllMocks();
     });
 
-    it("should return 403 if user is not an admin", async () => {
-        utils.isAdmin.mockResolvedValue(false);
+    test("should return a list of users for an admin", async () => {
+        const users = [
+            {
+                uid: 1,
+                user_email: "admin@example.com",
+                user_name: "Admin",
+                user_statusus_id: 1,
+                user_typeutid: 1,
+            },
+            {
+                uid: 2,
+                user_email: "user@example.com",
+                user_name: "User",
+                user_statusus_id: 2,
+                user_typeutid: 3,
+            },
+        ];
+        userTypeMock.mockResolvedValue(1);
+        findAllMock.mockResolvedValue(users);
 
-        await getUsers(req, res);
+        const result = await services.getUsers("admin-token");
 
-        expect(res.status).toHaveBeenCalledWith(403);
-        expect(res.send).toHaveBeenCalledWith({
-            success: 0,
-            message: "Sem permissão",
-        });
-    });
-
-    it("should return users if user is an admin", async () => {
-        utils.isAdmin.mockResolvedValue(true);
-        db.user.findAll.mockResolvedValue([
-            { uid: 1, user_email: "user1@example.com", user_name: "User 1" },
-        ]);
-
-        await getUsers(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.send).toHaveBeenCalledWith({
+        expect(result).toEqual({
             success: 1,
-            length: 1,
-            results: [
-                {
-                    id: 1,
-                    email: "user1@example.com",
-                    name: "User 1",
-                    status: undefined,
-                    type: undefined,
-                },
-            ],
+            length: users.length,
+            results: users.map((user) => ({
+                id: user.uid,
+                email: user.user_email,
+                name: user.user_name,
+                status: user.user_statusus_id,
+                type: user.user_typeutid,
+            })),
         });
     });
 
-    it("should return 404 if no users found", async () => {
-        utils.isAdmin.mockResolvedValue(true);
-        db.user.findAll.mockResolvedValue([]);
+    test("should throw an error for a manager user", async () => {
+        userTypeMock.mockResolvedValue(2);
 
-        await getUsers(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.send).toHaveBeenCalledWith({
-            success: 0,
-            message: "Não existem utilizadores",
-        });
+        await expect(services.getUsers("manager-token")).rejects.toThrow(
+            "Sem permissao!"
+        );
     });
 
-    it("should return 500 if an error occurs", async () => {
-        utils.isAdmin.mockRejectedValue(new Error("Database error"));
+    test("should throw an error for a regular user", async () => {
+        userTypeMock.mockResolvedValue(3);
 
-        await getUsers(req, res);
+        await expect(services.getUsers("user-token")).rejects.toThrow(
+            "Sem permissao!"
+        );
+    });
 
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith({
-            error: expect.any(Error),
-            message: "Database error",
-        });
+    test("should throw an error if user type is not recognized", async () => {
+        userTypeMock.mockResolvedValue(99);
+
+        await expect(services.getUsers("unknown-token")).rejects.toThrow(
+            "Utilizador nao reconhecido!"
+        );
+    });
+
+    test("should handle errors from the database", async () => {
+        userTypeMock.mockResolvedValue(1);
+        findAllMock.mockRejectedValue(new Error("Database error"));
+
+        await expect(services.getUsers("admin-token")).rejects.toThrow(
+            "Database error"
+        );
     });
 });
