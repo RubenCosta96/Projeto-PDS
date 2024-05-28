@@ -3,7 +3,7 @@ const utils = require("../utils/index");
 const services = require('../Services/ads');
 
 exports.getAds = async (req, res) => {
-  try {s
+  try {
 
     let response = await services.getAds();
 
@@ -54,6 +54,7 @@ exports.editAd = async (req, res) => {
   }
 };
 
+
 exports.removeAd = async (req, res) => {
   try {
     let id = req.params.id;
@@ -77,7 +78,6 @@ exports.confirmPayment = async (req, res) => {
 
     return res.status(200).send(response);
   } catch (err) {
-    console.error("Error editing ad:", err);
     return res.status(500).send({ error: err, message: err.message });
   }
 };

@@ -84,7 +84,7 @@ exports.confirmPayment = async (id, propId) => {
 
         let prop = await db.proposal.findByPk(propId);
 
-        if(prop.proposal_statepsid != 4 || ad.adid != prop.adadid){
+        if(prop.proposal_statepsid != 2 || ad.adid != prop.adadid){
             throw new Error("Sem permissão");
         }
 
