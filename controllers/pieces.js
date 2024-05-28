@@ -1,6 +1,6 @@
 const db = require('../config/mysql');
 const utils = require("../utils/index");
-const services = require('../services/pieces');
+const services = require('../Services/pieces');
 
 exports.getPieces = async (req, res) => {
 	try {
@@ -57,6 +57,19 @@ exports.getPiecesByCollection = async (req, res) => {
         let collectionName = req.params.collectionName;
 
 		let response = await services.getPieceByCollection(collectionName);
+
+        return res.status(200).send(response);
+    } catch (err) {
+        console.error("Error fetching pieces by collection:", err);
+        return res.status(500).send({ error: err, message: err.message });
+    }
+}
+
+exports.getPiecesByMuseum = async (req, res) => {
+    try {
+        let museumName = req.params.museumName;
+
+		let response = await services.getPieceByMuseum(museumName);
 
         return res.status(200).send(response);
     } catch (err) {

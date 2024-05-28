@@ -302,7 +302,7 @@ exports.getPieceByMuseum = async (museumName) => {
         }
 
         let pieces = await db.piece.findAll({ where: {
-			 collectioncid: collection.cid 
+			 museummid: museum.mid 
 			},
 			include: [{
 				model: db.artist,
