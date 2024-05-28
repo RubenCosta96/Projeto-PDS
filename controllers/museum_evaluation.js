@@ -1,6 +1,5 @@
 const utils = require("../utils/index");
 const db = require("../config/mysql");
-const services = require("../Services/ad_states");
 
 exports.getMuseumEvaluations = async (req, res) => {
   try {
@@ -52,7 +51,7 @@ exports.getMuseumEvaluation = async (req, res) => {
 
 exports.addMuseumEvaluation = async (req, res) => {
   try {
-    let { description, evaluation, museumId, userId } = req.body;
+    let { description, evaluation} = req.body;
 
     let newMuseum_Evaluation = await db.museum_evaluation.create({
       me_description: description,

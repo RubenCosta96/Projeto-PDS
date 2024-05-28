@@ -3,7 +3,7 @@ const db = require("../config/mysql");
 const utils = require("../utils/index");
 const user = require("../models/user");
 
-exports.getAllProposals = async (req, res) => {
+exports.getAllProposals = async (idUserToken) => {
   try {
     let result = await db.proposal.findAll();
 
