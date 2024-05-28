@@ -51,21 +51,23 @@ exports.getPieceById = async (id) => {
 			where:{
 				pid:id
 		},
-		include: [{
-			model: db.artist,
-			as: 'artistum',
-			attributes: ['artist_name'],
-		}],
-		include: [{
-			model: db.collection,
-			as: 'collectionc',
-			attributes: ['collection_name'],
-		}],
-		include: [{
-			model: db.piece_category,
-			as: 'piece_categorypc',
-			attributes: ['pc_description'],
-		}],
+		include: [
+			{
+				model: db.artist,
+				as: 'artistum',
+				attributes: ['artist_name'],
+			},
+			{
+				model: db.collection,
+				as: 'collectionc',
+				attributes: ['collection_name'],
+			},
+			{
+				model: db.piece_category,
+				as: 'piece_categorypc',
+				attributes: ['pc_description'],
+			}
+		]
 	});
 
 		if (!piece) {
@@ -95,21 +97,23 @@ exports.getPieceById = async (id) => {
 exports.getPieces = async (id) => {
     try{
         let pieces = await db.piece.findAll({
-		include: [{
-			model: db.artist,
-			as: 'artistum',
-			attributes: ['artist_name'],
-		}],
-		include: [{
-			model: db.collection,
-			as: 'collectionc',
-			attributes: ['collection_name'],
-		}],
-		include: [{
-			model: db.piece_category,
-			as: 'piece_categorypc',
-			attributes: ['pc_description'],
-		}],
+			include: [
+                {
+                    model: db.artist,
+                    as: 'artistum',
+                    attributes: ['artist_name'],
+                },
+                {
+                    model: db.collection,
+                    as: 'collectionc',
+                    attributes: ['collection_name'],
+                },
+                {
+                    model: db.piece_category,
+                    as: 'piece_categorypc',
+                    attributes: ['pc_description'],
+                }
+            ]
 	});
 
 		if (pieces.length === 0) throw new Error("Não existem peças");
@@ -138,26 +142,27 @@ exports.getPieces = async (id) => {
 
 exports.getPieceByName = async (name) => {
     try{
-        let pieces = await db.museum.findAll({ 
-			where: { 
-				piece_name: name 
-			},
-			include: [{
-				model: db.artist,
-				as: 'artistum',
-				attributes: ['artist_name'],
-			}],
-			include: [{
-				model: db.collection,
-				as: 'collectionc',
-				attributes: ['collection_name'],
-			}],
-			include: [{
-				model: db.piece_category,
-				as: 'piece_categorypc',
-				attributes: ['pc_description'],
-			}],
-		});
+
+        let pieces = await db.piece.findAll({
+            where: { piece_name: name  },
+            include: [
+                {
+                    model: db.artist,
+                    as: 'artistum',
+                    attributes: ['artist_name'],
+                },
+                {
+                    model: db.collection,
+                    as: 'collectionc',
+                    attributes: ['collection_name'],
+                },
+                {
+                    model: db.piece_category,
+                    as: 'piece_categorypc',
+                    attributes: ['pc_description'],
+                }
+            ]
+        });
 
 		if (!pieces) {
 			throw new Error("Peça inexistente");
@@ -196,21 +201,23 @@ exports.getPieceByCategory = async (categoryName) => {
         let pieces = await db.piece.findAll({ where: { 
 			piece_categorypcid: category.pcid 
 		},
-		include: [{
-			model: db.artist,
-			as: 'artistum',
-			attributes: ['artist_name'],
-		}],
-		include: [{
-			model: db.collection,
-			as: 'collectionc',
-			attributes: ['collection_name'],
-		}],
-		include: [{
-			model: db.piece_category,
-			as: 'piece_categorypc',
-			attributes: ['pc_description'],
-		}],
+		include: [
+			{
+				model: db.artist,
+				as: 'artistum',
+				attributes: ['artist_name'],
+			},
+			{
+				model: db.collection,
+				as: 'collectionc',
+				attributes: ['collection_name'],
+			},
+			{
+				model: db.piece_category,
+				as: 'piece_categorypc',
+				attributes: ['pc_description'],
+			}
+		]
 	});
 
         if (!pieces) {
@@ -247,25 +254,26 @@ exports.getPieceByCollection = async (collectionName) => {
             throw new Error("Coleção Inexistente!");
         }
 
-        let pieces = await db.piece.findAll({ where: {
-			 collectioncid: collection.cid 
-			},
-			include: [{
-				model: db.artist,
-				as: 'artistum',
-				attributes: ['artist_name'],
-			}],
-			include: [{
-				model: db.collection,
-				as: 'collectionc',
-				attributes: ['collection_name'],
-			}],
-			include: [{
-				model: db.piece_category,
-				as: 'piece_categorypc',
-				attributes: ['pc_description'],
-			}],
-		});
+        let pieces = await db.piece.findAll({
+            where: {  collectioncid: collection.cid },
+            include: [
+                {
+                    model: db.artist,
+                    as: 'artistum',
+                    attributes: ['artist_name'],
+                },
+                {
+                    model: db.collection,
+                    as: 'collectionc',
+                    attributes: ['collection_name'],
+                },
+                {
+                    model: db.piece_category,
+                    as: 'piece_categorypc',
+                    attributes: ['pc_description'],
+                }
+            ]
+        });
 
         if (!pieces) {
             throw new Error("Não há peças para esta coleção");
@@ -293,33 +301,38 @@ exports.getPieceByCollection = async (collectionName) => {
 	}
 };
 
-exports.getPieceByMuseum = async (museumId) => {
+exports.getPieceByMuseum = async (id) => {
     try{
-        let museum = await db.museum.findByPk(museumId);
+        let museum = await db.museum.findByPk(id);
 
         if (!museum) {
             throw new Error("Museu Inexistente!");
         }
 
-        let pieces = await db.piece.findAll({ where: {
-			 museummid: museum.mid 
-			},
-			include: [{
-				model: db.artist,
-				as: 'artistum',
-				attributes: ['artist_name'],
-			}],
-			include: [{
-				model: db.collection,
-				as: 'collectionc',
-				attributes: ['collection_name'],
-			}],
-			include: [{
-				model: db.piece_category,
-				as: 'piece_categorypc',
-				attributes: ['pc_description'],
-			}],
-		});
+        let pieces = await db.piece.findAll({
+            where: { museummid: museum.mid },
+            include: [
+                {
+                    model: db.artist,
+                    as: 'artistum',
+                    attributes: ['artist_name'],
+                },
+                {
+                    model: db.collection,
+                    as: 'collectionc',
+                    attributes: ['collection_name'],
+                },
+                {
+                    model: db.piece_category,
+                    as: 'piece_categorypc',
+                    attributes: ['pc_description'],
+                }
+            ]
+        });
+
+        if (pieces.length === 0) {
+            throw new Error("Não há peças para este museu");
+        }
 
         if (!pieces) {
             throw new Error("Não há peças para este museu");
