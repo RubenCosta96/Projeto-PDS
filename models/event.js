@@ -8,11 +8,11 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true
     },
     event_start_date: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DATEONLY,
       allowNull: false
     },
     event_end_date: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DATEONLY,
       allowNull: false
     },
     event_typeetid: {
@@ -38,39 +38,22 @@ module.exports = function(sequelize, DataTypes) {
         model: 'event_status',
         key: 'es_id'
       }
+    },
+    Price: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     sequelize,
     tableName: 'event',
+    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PRIMARY",
+        name: "PK__event__D9509F6D85A11790",
         unique: true,
-        using: "BTREE",
         fields: [
           { name: "eid" },
-        ]
-      },
-      {
-        name: "FKevent956024",
-        using: "BTREE",
-        fields: [
-          { name: "event_typeetid" },
-        ]
-      },
-      {
-        name: "FKevent814262",
-        using: "BTREE",
-        fields: [
-          { name: "museummid" },
-        ]
-      },
-      {
-        name: "FKevent369126",
-        using: "BTREE",
-        fields: [
-          { name: "event_statuses_id" },
         ]
       },
     ]

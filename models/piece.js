@@ -37,7 +37,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     museummid: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'museum',
         key: 'mid'
@@ -46,42 +46,14 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'piece',
+    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PRIMARY",
+        name: "PK__piece__DD37D91A850540A7",
         unique: true,
-        using: "BTREE",
         fields: [
           { name: "pid" },
-        ]
-      },
-      {
-        name: "FKpiece817937",
-        using: "BTREE",
-        fields: [
-          { name: "artistaid" },
-        ]
-      },
-      {
-        name: "FKpiece179481",
-        using: "BTREE",
-        fields: [
-          { name: "collectioncid" },
-        ]
-      },
-      {
-        name: "FKpiece299908",
-        using: "BTREE",
-        fields: [
-          { name: "piece_categorypcid" },
-        ]
-      },
-      {
-        name: "FKpiece43161",
-        using: "BTREE",
-        fields: [
-          { name: "museummid" },
         ]
       },
     ]

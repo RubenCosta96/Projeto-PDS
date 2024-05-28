@@ -22,21 +22,14 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'favorites',
+    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PRIMARY",
+        name: "PK__favorite__10E6B8F661FE79E0",
         unique: true,
-        using: "BTREE",
         fields: [
           { name: "useruid" },
-          { name: "productprodid" },
-        ]
-      },
-      {
-        name: "FKfavorites864729",
-        using: "BTREE",
-        fields: [
           { name: "productprodid" },
         ]
       },

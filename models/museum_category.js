@@ -14,12 +14,12 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'museum_category',
+    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PRIMARY",
+        name: "PK__museum_c__7BBD3CAF6914B151",
         unique: true,
-        using: "BTREE",
         fields: [
           { name: "mcid" },
         ]

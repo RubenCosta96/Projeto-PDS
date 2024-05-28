@@ -30,21 +30,14 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'event_evaluation',
+    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PRIMARY",
+        name: "PK__event_ev__A84F48928F7C13D2",
         unique: true,
-        using: "BTREE",
         fields: [
           { name: "useruid" },
-          { name: "eventeid" },
-        ]
-      },
-      {
-        name: "FKevent_eval415646",
-        using: "BTREE",
-        fields: [
           { name: "eventeid" },
         ]
       },
