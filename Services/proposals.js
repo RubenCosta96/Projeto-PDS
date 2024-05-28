@@ -5,339 +5,308 @@ const user = require("../models/user");
 const museum = require("../models/museum");
 
 exports.getAllProposals = async (idUserToken) => {
-  try {
-    let user = await utils.userType(idUserToken);
-    let result;
-    
-    switch(user){
-        case 1:     //Admin, nao tem acesso a esta funçao 
-          result = await db.proposal.findAll();
+	try {
+		let user = await utils.userType(idUserToken);
+		let result;
 
-          if (result.length === 0)
-            throw new Error("Não existem propostas!");
+		switch (user) {
+			case 1: //Admin, nao tem acesso a esta funçao
+				result = await db.proposal.findAll();
 
-          break;
-        case 2:     //Manager, tem acesso as tickets do seu museu
-          let museum = await db.usermuseum.findOne({
-            where:{
-              useruid: idUserToken,
-            }
-          });
-          result = await db.proposal.findAll({
-            where:{
-              museummid: museum.museummid
-            }
-          });
+				if (result.length === 0) throw new Error("Não existem propostas!");
 
-          if (result.length === 0)
-            throw new Error("Não existem propostas para o seu museu!");
+				break;
+			case 2: //Manager, tem acesso as tickets do seu museu
+				let museum = await db.usermuseum.findOne({
+					where: {
+						useruid: idUserToken,
+					},
+				});
+				result = await db.proposal.findAll({
+					where: {
+						museummid: museum.museummid,
+					},
+				});
 
-          break;
-        case 3: 
-          result = await db.proposal.findAll({
-            include:[{
-              model: db.ad,
-              as: 'adad',
-              attributes: ['useruid']
-            }],
-            where: {
-              '$adad.useruid$': idUserToken, // Condição global usando includes
-              // Adicione outras condições gerais aqui se necessário
-            }
-          });
-          
-          if(result.length === 0) {
-            throw new Error("Não existem propostas!");
-          }
-          break;
-        default:
-            throw new Error("Utilizador nao reconhecido!");            
-    }
+				if (result.length === 0) throw new Error("Não existem propostas para o seu museu!");
 
-    let response = {
-      success: 1,
-      length: result.length,
-      results: result.map((proposal) => {
-        return {
-            proposalid: proposal.proposalid,
-            price: proposal.price,
-            adId: proposal.adadid,
-            museumId: proposal.museummid,
-        };
-      }),
-    };
+				break;
+			case 3:
+				result = await db.proposal.findAll({
+					include: [
+						{
+							model: db.ad,
+							as: "adad",
+							attributes: ["useruid"],
+						},
+					],
+					where: {
+						"$adad.useruid$": idUserToken,
+					},
+				});
 
-  return response;
-} catch (err) {
-  throw new Error(err);
-}
+				if (result.length === 0) {
+					throw new Error("Não existem propostas!");
+				}
+				break;
+			default:
+				throw new Error("Utilizador nao reconhecido!");
+		}
+
+		let response = {
+			success: 1,
+			length: result.length,
+			results: result.map((proposal) => {
+				return {
+					proposalid: proposal.proposalid,
+					price: proposal.price,
+					adId: proposal.adadid,
+					museumId: proposal.museummid,
+				};
+			}),
+		};
+
+		return response;
+	} catch (err) {
+		throw new Error(err);
+	}
 };
 
-exports.getAllProposalsByMuseum = async (req, res) => {
-    try {
-        let id = req.params.id;
+exports.getAllProposalsByMuseum = async (id) => {
+	try {
+		let museum = await db.museum.findByPk(id);
 
-        let museum = await db.museum.findByPk(id);
+		if (!museum) {
+			throw new Error("O museu indicado nao existe");
+		}
 
-        if(!museum){
-            return res
-            .status(404)
-            .send({ success: 0, message: "O museu indicado nao existe" });
-        }
+		let result = await db.proposal.findAll({
+			where: {
+				museummid: id,
+			},
+		});
 
-        let result = await db.proposal.findAll({
-            where:{
-                museummid: id,
-            }
-        });
-  
-        if (result.length === 0)
-        return res
-          .status(404)
-          .send({ success: 0, message: "Não existem propostas relativas ao museu indicado" });
-  
-        let response = {
-            success: 1,
-            length: result.length,
-            results: result.map((proposal) => {
-            return {
-                proposalid: proposal.proposalid,
-                price: proposal.price,
-                adId: proposal.adadid,
-                museumId: proposal.museummid,
-            };
-            }),
-        };
-        return res.status(200).send(response);
-        } catch (err) {
-        return res.status(500).send({ error: err, message: err.message });
-        }
+		if (result.length === 0) throw new Error("Não existem propostas relativas ao museu indicado");
+
+		let response = {
+			success: 1,
+			length: result.length,
+			results: result.map((proposal) => {
+				return {
+					proposalid: proposal.proposalid,
+					price: proposal.price,
+					adId: proposal.adadid,
+					museumId: proposal.museummid,
+				};
+			}),
+		};
+
+		return response;
+	} catch (err) {
+		throw new Error(err);
+	}
 };
 
-exports.getAllProposalsByAd = async (req, res) => {
-    try {
-        let id = req.params.id;
+exports.getAllProposalsByAd = async (id) => {
+	try {
+		let museum = await db.ad.findByPk(id);
 
-        let museum = await db.ad.findByPk(id);
+		if (!museum) {
+			throw new Error("O anuncio indicado nao existe");
+		}
 
-        if(!museum){
-            return res
-            .status(404)
-            .send({ success: 0, message: "O anuncio indicado nao existe" });
-        }
+		let result = await db.proposal.findAll({
+			where: {
+				adadid: id,
+			},
+		});
 
-        let result = await db.proposal.findAll({
-            where:{
-                adadid: id,
-            }
-        });
-  
-        if (result.length === 0)
-        return res
-          .status(404)
-          .send({ success: 0, message: "Não existem propostas relativas ao anuncio indicado" });
-  
-        let response = {
-            success: 1,
-            length: result.length,
-            results: result.map((proposal) => {
-            return {
-                proposalid: proposal.proposalid,
-                price: proposal.price,
-                adId: proposal.adadid,
-                museumId: proposal.museummid,
-            };
-            }),
-        };
-        return res.status(200).send(response);
-        } catch (err) {
-        return res.status(500).send({ error: err, message: err.message });
-        }
-  };
-  
-exports.getProposal = async (req, res) => {
-  try {
-    let id = req.params.id;
+		if (result.length === 0) throw new Error("Não existem propostas relativas ao anuncio indicado");
 
-    let result = await db.proposal.findByPk(id);
+		let response = {
+			success: 1,
+			length: result.length,
+			results: result.map((proposal) => {
+				return {
+					proposalid: proposal.proposalid,
+					price: proposal.price,
+					adId: proposal.adadid,
+					museumId: proposal.museummid,
+				};
+			}),
+		};
 
-    if (!result) {
-      return res
-        .status(404)
-        .send({ success: 0, message: "Proposta inexistente" });
-    }
-
-    let response = {
-      success: 1,
-      results: {
-        proposalid: result.proposalid,
-        price: result.price,
-        adId: result.adadid,
-        museumId: result.museummid,
-      },
-    };
-
-    return res.status(200).send(response);
-  } catch (err) {
-    return res.status(500).send({ error: err, message: err.message });
-  }
+		return response;
+	} catch (err) {
+		throw new Error(err);
+	}
 };
 
-exports.addProposal = async (req, res) => {
-  try {
-    let price = req.body.price;
-    let adId = req.body.adId;
-    let idUserToken = req.user.id;
+exports.getProposal = async (id) => {
+	try {
+		let result = await db.proposal.findByPk(id);
 
-    let isManager = await utils.isManager(idUserToken);
+		if (!result) {
+			throw new Error("Proposta inexistente");
+		}
 
-    if (!isManager) {
-      return res.status(403).send({ success: 0, message: "Sem permissão" });
-    }
+		let response = {
+			success: 1,
+			results: {
+				proposalid: result.proposalid,
+				price: result.price,
+				adId: result.adadid,
+				museumId: result.museummid,
+			},
+		};
 
-    let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken } });
-    //Verificaçao para entradas repetidas nas BD
-
-    let newProposal = await db.proposal.create({
-        price: price,
-        adadid: adId,
-        museummid: manager.museummid,
-        proposal_statepsid: 1,
-    });
-
-    let response = {
-      success: 1,
-      message: "Proposta criada com sucesso",
-    };
-
-    return res.status(200).send(response);
-  } catch (err) {
-    console.error("Error adding proposal:", err);
-    return res.status(500).send({ error: err, message: err.message });
-  }
+		return response;
+	} catch (err) {
+		throw new Error(err);
+	}
 };
 
-exports.removeProposal = async (req, res) => {
-  try {
-    let id = req.params.id;
-    let idUserToken = req.user.id;
+exports.addProposal = async (price, adId, idUserToken) => {
+	try {
+		let user = await utils.userType(idUserToken);
 
-    const result = await db.proposal.findByPk(id);
+		switch (user) {
+			case 1: //Admin
+				throw new Error("Sem permissao!");
+			case 2: //Manager
+				let manager = await db.usermuseum.findOne({ where: { useruid: idUserToken } });
 
-    if (!result) {
-      return res
-        .status(404)
-        .send({ success: 0, message: "proposta inexistente" });
-    }
+				let newProposal = await db.proposal.create({
+					price: price,
+					adadid: adId,
+					museummid: manager.museummid,
+					proposal_statepsid: 1,
+				});
+				break;
+			case 3: //User
+				throw new Error("Sem permissao!");
+			default:
+				throw new Error("Utilizador nao reconhecido!");
+		}
 
-    let isAdmin = await utils.isAdmin(idUserToken); //Verificar
+		let response = {
+			success: 1,
+			message: "Proposta criada com sucesso",
+		};
 
-    if (!isAdmin) {
-      return res.status(403).send({ success: 0, message: "Sem permissão" });
-    }
-
-    await result.destroy();
-
-    let response = {
-      success: 1,
-      message: "Proposta removida com sucesso",
-    };
-
-    return res.status(200).send(response);
-  } catch (err) {
-    console.error("Error removing proposal:", err);
-    return res.status(500).send({ error: err, message: err.message });
-  }
+		return response;
+	} catch (err) {
+		throw new Error(err);
+	}
 };
 
+exports.removeProposal = async (id, idUserToken) => {
+	try {
+		const result = await db.proposal.findByPk(id);
 
-exports.acceptProposal = async (req, res) => {
-  try {
-    let id = req.params.id;
-    let idUserToken = req.user.id;
+		if (!result) {
+			throw new Error("proposta inexistente");
+		}
 
-    const result = await db.proposal.findByPk(id,{
-      include:[{
-        model: db.ad,
-        as: "adad",
-        attributes: ["adid"]
-      }]
-    });
+		let user = await utils.userType(idUserToken);
 
-    if (!result) {
-      return res
-        .status(404)
-        .send({ success: 0, message: "proposta inexistente" });
-    }
+		switch (user) {
+			case 1: //Admin
+				await result.destroy();
+				break;
+			case 2: //Manager
+				throw new Error("Sem permissao!");
+			case 3: //User
+				throw new Error("Sem permissao!");
+			default:
+				throw new Error("Utilizador nao reconhecido!");
+		}
 
-    const ad = await db.ad.findByPk(result.adad.adid);
+		let response = {
+			success: 1,
+			message: "Proposta removida com sucesso",
+		};
 
-    if(!ad){
-      return res
-      .status(403)
-      .send({ success: 0, message: "Sem premissao" });
-    }
-
-    ad.ad_stateadstid = 2;
-    result.proposal_statepsid = 2;
-
-    await ad.save();
-    await result.save();
-
-    let response = {
-      success: 1,
-      message: "Proposta aceite",
-    };
-
-    return res.status(200).send(response);
-  } catch (err) {
-    return res.status(500).send({ error: err, message: err.message });
-  }
+		return response;
+	} catch (err) {
+		throw new Error(err);
+	}
 };
 
+exports.acceptProposal = async (id) => {
+	try {
+		const result = await db.proposal.findByPk(id, {
+			include: [
+				{
+					model: db.ad,
+					as: "adad",
+					attributes: ["adid"],
+				},
+			],
+		});
 
-//testar no fim 
-exports.rejectProposal = async (req, res) => {
-  try {
-    let id = req.params.id;
-    let idUserToken = req.user.id;
+		if (!result) {
+			throw new Error("proposta inexistente");
+		}
 
-    const result = await db.proposal.findByPk(id,{
-      include:[{
-        model: db.ad,
-        as: "adad",
-        attributes: ["adid"]
-      }]
-    });
+		const ad = await db.ad.findByPk(result.adad.adid);
 
-    if (!result) {
-      return res
-        .status(404)
-        .send({ success: 0, message: "proposta inexistente" });
-    }
+		if (!ad) {
+			throw new Error("Não existe anuncio");
+		}
 
-    const ad = await db.ad.findByPk(result.adad.adid);
+		ad.ad_stateadstid = 2;
+		result.proposal_statepsid = 2;
 
-    if(!ad){
-      return res
-      .status(403)
-      .send({ success: 0, message: "Sem premissao" });
-    }
+		await ad.save();
+		await result.save();
 
-    ad.ad_stateadstid = 1;
-    result.proposal_statepsid = 3;
+		let response = {
+			success: 1,
+			message: "Proposta aceite",
+		};
 
-    await ad.save();
-    await result.save();
+		return response;
+	} catch (err) {
+		throw new Error(err);
+	}
+};
 
-    let response = {
-      success: 1,
-      message: "Proposta recusada",
-    };
+exports.rejectProposal = async (id) => {
+	try {
+		const result = await db.proposal.findByPk(id, {
+			include: [
+				{
+					model: db.ad,
+					as: "adad",
+					attributes: ["adid"],
+				},
+			],
+		});
 
-    return res.status(200).send(response);
-  } catch (err) {
-    console.error("Error recusing proposal:", err);
-    return res.status(500).send({ error: err, message: err.message });
-  }
+		if (!result) {
+			throw new Error("proposta inexistente");
+		}
+
+		const ad = await db.ad.findByPk(result.adad.adid);
+
+		if (!ad) {
+			throw new Error("Não existe anuncio");
+		}
+
+		ad.ad_stateadstid = 1;
+		result.proposal_statepsid = 3;
+
+		await ad.save();
+		await result.save();
+
+		let response = {
+			success: 1,
+			message: "Proposta recusada",
+		};
+
+		return response;
+	} catch (err) {
+		throw new Error(err);
+	}
 };
