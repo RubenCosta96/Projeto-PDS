@@ -22,7 +22,7 @@ exports.getSupportTicket = async (req, res) => {
     try {
         let idUserToken = req.user.id;
         let id = req.params.id;
-  
+		
         let response = await services.getSupportTicket(idUserToken,id);
 
 		if(response.length === 0)
@@ -33,7 +33,6 @@ exports.getSupportTicket = async (req, res) => {
         return res.status(500).send({ error: err, message: err.message });
     }
 };
-
 
 
 exports.addSupportTicket = async (req, res) => {

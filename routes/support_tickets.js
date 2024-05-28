@@ -32,7 +32,7 @@ router.post('/supportTickets/informMissingData/:id', login.required, support_tic
 router.put('/supportTickets/redirect/:id', login.required, support_ticket_controller.redirectTicket);
 
 //List all support evaluations
-router.get("/supportTickets/evaluations", login.required, supportTicketEvaluationController.getAllSupportEvaluations);
+router.get("/supportTicket/evaluations", login.required, supportTicketEvaluationController.getAllSupportEvaluations);   //ver problema com rota
 //List sprecific support evaluations
 router.get("/supportTickets/evaluations/:id", login.required, supportTicketEvaluationController.getSupportEvaluations);
 //Add support evaluations

@@ -1,11 +1,30 @@
 const db = require('../config/mysql');
 const utils = require("../utils/index");
+const services = require('../services/support_evaluations');
 
+
+exports.getAllSupportEvaluations = async (req, res) =>{
+    try{
+		let idUserToken = req.user.id;
+
+		let response = await services.getAllSupportEvaluations(idUserToken);
+
+    	return res.status(200).send(response);
+    }catch (err) {
+		return res.status(500).send({ error: err, message: err.message });
+	}
+
+};
+
+
+/*
 exports.getAllSupportEvaluations = async (req, res) =>{
     try{
 		let support_evaluations = await db.support_evaluation.findAll();
 
 		if (support_evaluations.length === 0) return res.status(404).send({ success: 0, message: "Não existem avaliações de suporte." });
+
+		
 
     	let response = {
       		success: 1,
@@ -26,11 +45,14 @@ exports.getAllSupportEvaluations = async (req, res) =>{
 	}
 
 };
+*/
+
+
 
 exports.getSupportEvaluations = async (req, res) =>{
     try{
         let id = req.params.id
-
+		
 		let support_ticket = await db.support_ticket.findByPk(id);
 		if (!support_ticket) return res.status(404).send({ success: 0, message: "Ticket inexistente" });
 

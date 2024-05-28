@@ -1,32 +1,42 @@
+const { where } = require('sequelize');
 const db = require('../config/mysql');
 const utils = require("../utils/index");
+
 
 exports.getAllSupportEvaluations = async (idUserToken) =>{
     try{
         let user = await utils.userType(idUserToken);
         let result;
+		console.log("teste")
 
         switch (user) {
             case 1:     //Admin, tem acesso a todas as avaliaçoes
                 result = await db.support_evaluation.findAll();
                 break;
             case 2:     //Manager, tem acesso as tickets do seu museu
-                let museum = await db.usermuseum.findOne({
-                    where: {
-                        useruid: idUserToken,
-                    }
-                });
-                result = await db.support_evaluation.findAll({
-                    include: [{
-                        model: db.support_ticket,
-                        as: 'support_evaluations',
-                        attributes: ['museummid']
-                    },{
-                        model: db.user,
-                        as: 'event_evaluations',
-                        attributes: ['user_name']
-                    },]
-                });
+				let museum = await db.usermuseum.findOne({
+					where: {
+						useruid: idUserToken,
+					},
+					include: [{
+						model: db.museum,
+						as: 'museumm',
+						attributes: ['museum_name'],
+					}]
+				});
+				let teste = await db.support_evaluation.findAll({
+					include: [{
+						model: db.support_ticket,
+						as: 'support_ticketst',
+						attributes: ['museummid']
+					},{
+						model: db.user,
+						as: 'useru',
+						attributes: ['user_name']
+					}]
+				});
+				const result = teste.filter(item => item.support_ticketst.museummid === museum.mid);
+				//fitar pelo museum do manager
                 break;
             case 3:     //User, tem acesso aos seus tickets
                 result = await db.support_ticket.findAll({
@@ -50,28 +60,25 @@ exports.getAllSupportEvaluations = async (idUserToken) =>{
         }
 
 
-		let support_evaluations = await db.support_evaluation.findAll();
-
-		if (support_evaluations.length === 0) return res.status(404).send({ success: 0, message: "Não existem avaliações de suporte." });
-
-    	let response = {
-      		success: 1,
-      		length: support_evaluations.length,
-      		results: support_evaluations.map((support_evaluation) => {
-        		return {
+		let response = {
+            success: 1,
+            length: result.length,
+            results: result.map((support_evaluation) => {
+                return {
 					description: support_evaluation.se_description,
 					evaluation: support_evaluation.se_evaluation,
 					user: support_evaluation.useruid,
+					username: support_evaluation.event_evaluations.user_name,
 					ticket: support_evaluation.support_ticketstid,
-       			 };
-     		 }),
-   		 };
+					museum:	support_evaluation.museumm.museum_name,
+                };
+            }),
+        };
 
-    	return res.status(200).send(response);
+        return response;
     }catch (err) {
-		return res.status(500).send({ error: err, message: err.message });
+		throw new Error(err);
 	}
-
 };
 
 exports.getSupportEvaluations = async (req, res) =>{
