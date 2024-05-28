@@ -91,13 +91,12 @@ exports.getPurchasesByInvoiceStatus = async (id) => {
 	}
 };
 
-exports.getPurchase = async (req, res) => {
+exports.getPurchase = async (id) => {
 	try {
-		let id = req.params.id;
 		let result = await db.purchase_invoice.findByPk(id);
 
 		if (!result) {
-			return res.status(404).send({ success: 0, message: "Registos de compras inexistente" });
+			throw new Error("Registos de compras inexistente");
 		}
 
 		let response = {
@@ -110,120 +109,119 @@ exports.getPurchase = async (req, res) => {
 			},
 		};
 
-		return res.status(200).send(response);
+		return response;
 	} catch (err) {
-		return res.status(500).send({ error: err, message: err.message });
+		throw new Error(err);
 	}
 };
 
-exports.addPurchase = async (req, res) => {
+exports.addPurchase = async (date, museumid, idUserToken) => {
 	try {
-		let date = req.body.date;
-		let museumid = req.body.museum_id;
-		let idUserToken = req.user.id;
+		let user = await utils.userType(idUserToken);
+		let newPurchaseInvoice;
 
-		let isManager = await utils.isManager(idUserToken);
-		let isAdmin = await utils.isAdmin(idUserToken);
-
-		if (!isManager && !isAdmin) {
-			return res.status(403).send({ success: 0, message: "Sem permissão" });
+		switch (user) {
+			case 1: // admin
+				newPurchaseInvoice = await db.purchase_invoice.create({
+					purchase_entry_date: date,
+					museummid: museumid,
+					Invoice_statusinvoicestatusid: 1,
+				});
+				break;
+			case 2: // manager
+				newPurchaseInvoice = await db.purchase_invoice.create({
+					purchase_entry_date: date,
+					museummid: museumid,
+					Invoice_statusinvoicestatusid: 1,
+				});
+				break;
+			case 3: // User
+				throw new Error("Sem permissao");
+			default:
+				throw new Error("Utilizador nao reconhecido!");
 		}
-
-		let user = await db.user.findByPk(idUserToken);
-		if (!user) {
-			return res.status(404).send({ success: 0, message: "Utilizador inexistente" });
-		}
-
-		//Verificaçao para entradas repetidas nas BD
-
-		let newPurchaseInvoice = await db.purchase_invoice.create({
-			purchase_entry_date: date,
-			museummid: museumid,
-			Invoice_statusinvoicestatusid: 1,
-		});
 
 		let response = {
 			success: 1,
 			message: "Compra registada com sucesso",
 		};
 
-		return res.status(200).send(response);
+		return response;
 	} catch (err) {
-		console.error("Error adding Purchase Invoice:", err);
-		return res.status(500).send({ error: err, message: err.message });
+		throw new Error(err);
 	}
 };
 
-exports.editPurchase = async (req, res) => {
+exports.editPurchase = async (id, idUserToken, date, museum_id, invoiceStatus) => {
 	try {
-		let id = req.params.id;
-		let idUserToken = req.user.id;
-
+		let user = await utils.userType(idUserToken);
 		let purchase = await db.purchase_invoice.findByPk(id);
 
 		if (!purchase) {
-			return res.status(404).send({ success: 0, message: "Registo de compra inexistente" });
+			throw new Error("Registo de compra inexistente");
 		}
 
-		let isManager = await utils.isManager(idUserToken); //Verificar
-		let isAdmin = await utils.isAdmin(idUserToken); //Verificar
+		switch (user) {
+			case 1: // admin
+				if (date) purchase.purchase_entry_date = date;
+				if (museum_id) purchase.museummid = museum_id;
+				if (invoiceStatus) purchase.Invoice_statusinvoicestatusid = invoiceStatus;
 
-		if (!isManager && !isAdmin) {
-			return res.status(403).send({ success: 0, message: "Sem permissão" });
+				await purchase.save();
+				break;
+			case 2: // manager
+				if (date) purchase.purchase_entry_date = date;
+				if (museum_id) purchase.museummid = museum_id;
+				if (invoiceStatus) purchase.Invoice_statusinvoicestatusid = invoiceStatus;
+
+				await purchase.save();
+				break;
+			case 3: // User
+				throw new Error("Sem permissao");
+			default:
+				throw new Error("Utilizador nao reconhecido!");
 		}
-
-		let { date, museum_id, invoiceStatus } = req.body;
-
-		if (date) purchase.purchase_entry_date = date;
-		if (museum_id) purchase.museummid = museum_id;
-		if (invoiceStatus) purchase.Invoice_statusinvoicestatusid = invoiceStatus;
-
-		await purchase.save();
 
 		let response = {
 			success: 1,
 			message: "Registo de compra editado com sucesso",
 		};
 
-		return res.status(200).send(response);
+		return response;
 	} catch (err) {
-		console.error("Error editing purchase invoice:", err);
-		return res.status(500).send({ error: err, message: err.message });
+		throw new Error(err);
 	}
 };
 
-exports.removePurchase = async (req, res) => {
+exports.removePurchase = async (id, idUserToken) => {
 	try {
-		let id = req.params.id;
-		let idUserToken = req.user.id;
-
-		const purchase = await db.purchase_invoice.findByPk(id);
+		let user = await utils.userType(idUserToken);
+		let purchase = await db.purchase_invoice.findByPk(id);
 
 		if (!purchase) {
-			return res.status(404).send({ success: 0, message: "Registo de compra inexistente" });
+			throw new Error("Registo de compra inexistente");
 		}
 
-		//let idOwner = artist.id_user; //ver se faz sentido
-
-		let isAdmin = await utils.isAdmin(idUserToken); //Verificar
-
-		if (!isAdmin) {
-			return res.status(403).send({ success: 0, message: "Sem permissão" });
+		switch (user) {
+			case 1: // admin
+				await purchase.destroy();
+				break;
+			case 2: // manager
+				throw new Error("Sem permissao");
+			case 3: // User
+				throw new Error("Sem permissao");
+			default:
+				throw new Error("Utilizador nao reconhecido!");
 		}
-
-		//Antes verificar se esta atribuido a algum produto, se sim nao permitir
-
-		await purchase.destroy();
 
 		let response = {
 			success: 1,
 			message: "Registo de compra removido com sucesso",
 		};
 
-		return res.status(200).send(response);
+		return response;
 	} catch (err) {
-		console.error("Error removing purchase invoice:", err);
-		return res.status(500).send({ error: err, message: err.message });
+		throw new Error(err);
 	}
 };
 
