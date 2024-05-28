@@ -27,6 +27,14 @@ module.exports = function(sequelize, DataTypes) {
         key: 'mid'
       }
     },
+    useruid: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'uid'
+      }
+    },
     priority: {
       type: DataTypes.INTEGER,
       allowNull: true
@@ -35,9 +43,9 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DATEONLY,
       allowNull: true
     },
-    useruid: {
+    admin_useruid: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'user',
         key: 'uid'
@@ -46,14 +54,42 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'support_ticket',
-    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK__support___312D1FC729E5AC86",
+        name: "PRIMARY",
         unique: true,
+        using: "BTREE",
         fields: [
           { name: "stid" },
+        ]
+      },
+      {
+        name: "FKsupport_ti689656",
+        using: "BTREE",
+        fields: [
+          { name: "support_statesssid" },
+        ]
+      },
+      {
+        name: "FKsupport_ti993949",
+        using: "BTREE",
+        fields: [
+          { name: "museummid" },
+        ]
+      },
+      {
+        name: "FKsupport_ti303040",
+        using: "BTREE",
+        fields: [
+          { name: "useruid" },
+        ]
+      },
+      {
+        name: "FKsupport_ti140257",
+        using: "BTREE",
+        fields: [
+          { name: "admin_useruid" },
         ]
       },
     ]

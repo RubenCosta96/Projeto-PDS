@@ -14,12 +14,12 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'ticket_status',
-    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK__ticket_s__F310C15B97642C80",
+        name: "PRIMARY",
         unique: true,
+        using: "BTREE",
         fields: [
           { name: "ts_id" },
         ]

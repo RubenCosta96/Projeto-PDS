@@ -53,7 +53,6 @@ exports.userType = async (id) => {
 
 		if (!user) return 0;
 
-
     let code = user.user_typeut.utid;
 
     switch(code){

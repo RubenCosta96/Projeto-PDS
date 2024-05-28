@@ -52,3 +52,18 @@ exports.addNotifications = async (req, res) =>{
 		throw new Error(err.message);
 	}
 };
+
+exports.informImproperConduct = async (req, res) =>{
+	try{
+		let id = req.params.id;
+		let idUserToken = req.user.id;
+		let description = req.body.description;
+		let type = req.body.type;
+
+		let response = await services.informImproperConduct(idUserToken, id, description, type)
+
+		return res.status(200).send(response);
+	}catch (err) {
+		return res.status(500).send({ error: err, message: err.message });
+	}
+}

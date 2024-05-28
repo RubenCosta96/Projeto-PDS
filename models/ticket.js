@@ -11,6 +11,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DATEONLY,
       allowNull: false
     },
+    ticket_price: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     eventeid: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -38,14 +42,35 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'ticket',
-    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK__ticket__DC105B0FFF82A5E1",
+        name: "PRIMARY",
         unique: true,
+        using: "BTREE",
         fields: [
           { name: "tid" },
+        ]
+      },
+      {
+        name: "FKticket844838",
+        using: "BTREE",
+        fields: [
+          { name: "eventeid" },
+        ]
+      },
+      {
+        name: "FKticket358381",
+        using: "BTREE",
+        fields: [
+          { name: "useruid" },
+        ]
+      },
+      {
+        name: "FKticket303505",
+        using: "BTREE",
+        fields: [
+          { name: "ticket_statusts_id" },
         ]
       },
     ]

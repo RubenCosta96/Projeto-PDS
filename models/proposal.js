@@ -8,7 +8,7 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true
     },
     price: {
-      type: DataTypes.REAL,
+      type: DataTypes.FLOAT,
       allowNull: true
     },
     adadid: {
@@ -19,33 +19,48 @@ module.exports = function(sequelize, DataTypes) {
         key: 'adid'
       }
     },
-    museummid: {
+    usermuseummuseummid: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'museum',
-        key: 'mid'
+        model: 'usermuseum',
+        key: 'museummid'
       }
     },
-    proposal_statepsid: {
+    usermuseumuseruid: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'proposal_state',
-        key: 'psid'
+        model: 'usermuseum',
+        key: 'useruid'
       }
     }
   }, {
     sequelize,
     tableName: 'proposal',
-    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK__proposal__3EB6EC3CE4D01BD4",
+        name: "PRIMARY",
         unique: true,
+        using: "BTREE",
         fields: [
           { name: "proposalid" },
+        ]
+      },
+      {
+        name: "FKproposal520078",
+        using: "BTREE",
+        fields: [
+          { name: "adadid" },
+        ]
+      },
+      {
+        name: "FKproposal542150",
+        using: "BTREE",
+        fields: [
+          { name: "usermuseummuseummid" },
+          { name: "usermuseumuseruid" },
         ]
       },
     ]

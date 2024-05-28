@@ -26,26 +26,32 @@ module.exports = function(sequelize, DataTypes) {
     description: {
       type: DataTypes.STRING(255),
       allowNull: true
-    },
-    ad_stateadstid: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'ad_state',
-        key: 'adstid'
-      }
     }
   }, {
     sequelize,
     tableName: 'ad',
-    schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK__ad__56B503F0164A2B39",
+        name: "PRIMARY",
         unique: true,
+        using: "BTREE",
         fields: [
           { name: "adid" },
+        ]
+      },
+      {
+        name: "FKad393708",
+        using: "BTREE",
+        fields: [
+          { name: "useruid" },
+        ]
+      },
+      {
+        name: "FKad263245",
+        using: "BTREE",
+        fields: [
+          { name: "piecepid" },
         ]
       },
     ]

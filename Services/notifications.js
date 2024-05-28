@@ -128,3 +128,41 @@ exports.addNotifications = async (idUserToken,description, type, userId) =>{
         throw new Error(err);
     }
 };
+
+exports.informImproperConduct = async (idUserToken,userId,description,type) =>{
+    try{
+        let user = await utils.userType(idUserToken);
+
+        switch (user) {
+			case 1: //Admin
+				try {
+					let user = await db.user.findByPk(id);
+                    if (!user) return res.status(404).send({ success: 0, message: 'Utilizador inexistente' });
+
+                    let newNotification = await db.notification.create({
+                        n_description: description,
+                        notification_typentid: type,
+                        useruid: userId,
+                        notification_statensid: 1
+                    });
+				} catch (err) {
+					throw new Error(err);
+				}
+                break;
+			case 2: //Manager
+                throw new Error("Sem permissao!");
+			case 3: //User
+                throw new Error("Sem permissao!");
+			default:
+				throw new Error("Utilizador nao reconhecido!");
+		}
+        let response = {
+			success: 1,
+			message: "Notificação enviada com sucesso",
+		};
+
+        return response;
+    }catch (err) {
+        throw new Error(err);
+    }
+};

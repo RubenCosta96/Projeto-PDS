@@ -10,6 +10,8 @@ const login = require("../middleware/login");
 router.post("/users/login", usersController.login);
 // Register
 router.post("/users/register", usersController.register);
+// Register Admin
+router.post("/users/register/admin", login.required,usersController.registerAdmin);
 // Verify Token
 router.get("/users/token/verify/:token", usersController.tokenVerify);
 // List all users
@@ -24,6 +26,8 @@ router.delete("/users/remove/:id", login.required, usersController.removeUser);
 router.put("/users/edit/type/:id", login.required, usersController.changeUserType);
 // Change Password
 router.put("/users/edit/password/:id", login.required, usersController.changePassword);
+// Edit User
+router.put("/users/edit/user", login.required, usersController.editUser);
 
 // List All status
 router.get("/users/status", UserStatusController.getAllUserStatus);
