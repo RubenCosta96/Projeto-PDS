@@ -41,6 +41,8 @@ router.post("/supportTickets/evaluations/add", login.required, supportTicketEval
 router.delete("/supportTickets/evaluations/remove/:id", login.required, supportTicketEvaluationController.removeSupportEvaluation);
 //Edit support evaluations
 router.put("/supportTickets/evaluations/edit/:id", login.required, supportTicketEvaluationController.editSupportEvaluation);
+//Edit support evaluations
+router.put("/supportTickets/evaluations/refuse", login.required, supportTicketEvaluationController.refuseSupportEvaluation);
 
 //List all support state
 router.get("/supportTickets/states", login.required, supportTicketStateController.getAllSupportStates);
