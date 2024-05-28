@@ -2,28 +2,14 @@ const { where } = require("sequelize");
 const db = require("../config/mysql");
 const utils = require("../utils/index");
 const user = require("../models/user");
+const services = require("../Services/proposals");
 
 exports.getAllProposals = async (req, res) => {
   try {
-    let result = await db.proposal.findAll();
+    let idUserToken = req.user.id;
+    
+    let response = await services.getAllProposals(idUserToken);
 
-    if (result.length === 0)
-      return res
-        .status(404)
-        .send({ success: 0, message: "Não existem propostas" });
-
-    let response = {
-      success: 1,
-      length: result.length,
-      results: result.map((proposal) => {
-        return {
-            proposalid: proposal.proposalid,
-            price: proposal.price,
-            adId: proposal.adadid,
-            museumId: proposal.museummid,
-        };
-      }),
-    };
     return res.status(200).send(response);
   } catch (err) {
     return res.status(500).send({ error: err, message: err.message });

@@ -2,15 +2,57 @@ const { where } = require("sequelize");
 const db = require("../config/mysql");
 const utils = require("../utils/index");
 const user = require("../models/user");
+const museum = require("../models/museum");
 
 exports.getAllProposals = async (idUserToken) => {
   try {
-    let result = await db.proposal.findAll();
+    let user = await utils.userType(idUserToken);
+    let result;
+    
+    switch(user){
+        case 1:     //Admin, nao tem acesso a esta funçao 
+          result = await db.proposal.findAll();
 
-    if (result.length === 0)
-      return res
-        .status(404)
-        .send({ success: 0, message: "Não existem propostas" });
+          if (result.length === 0)
+            throw new Error("Não existem propostas!");
+
+          break;
+        case 2:     //Manager, tem acesso as tickets do seu museu
+          let museum = await db.usermuseum.findOne({
+            where:{
+              useruid: idUserToken,
+            }
+          });
+          result = await db.proposal.findAll({
+            where:{
+              museummid: museum.museummid
+            }
+          });
+
+          if (result.length === 0)
+            throw new Error("Não existem propostas para o seu museu!");
+
+          break;
+        case 3: 
+          result = await db.proposal.findAll({
+            include:[{
+              model: db.ad,
+              as: 'adad',
+              attributes: ['useruid']
+            }],
+            where: {
+              '$adad.useruid$': idUserToken, // Condição global usando includes
+              // Adicione outras condições gerais aqui se necessário
+            }
+          });
+          
+          if(result.length === 0) {
+            throw new Error("Não existem propostas!");
+          }
+          break;
+        default:
+            throw new Error("Utilizador nao reconhecido!");            
+    }
 
     let response = {
       success: 1,
@@ -24,10 +66,11 @@ exports.getAllProposals = async (idUserToken) => {
         };
       }),
     };
-    return res.status(200).send(response);
-  } catch (err) {
-    return res.status(500).send({ error: err, message: err.message });
-  }
+
+  return response;
+} catch (err) {
+  throw new Error(err);
+}
 };
 
 exports.getAllProposalsByMuseum = async (req, res) => {
