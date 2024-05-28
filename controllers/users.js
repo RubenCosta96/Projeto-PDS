@@ -10,29 +10,7 @@ exports.login = async (req, res) => {
 		let email = req.body.email; 
 		let password = req.body.password;
 
-		let user = await db.user.findOne({ where: { user_email: email } });
-
-		if (!user) {
-			return res.status(401).send({ success: 0, message: 'Falha na autenticação' });
-		}
-		if (bcrypt.compareSync(password, user.user_password)) {
-			let token = jwt.sign(
-				{
-					id: user.uid,
-				},
-				'#^NJW5SKJ$Oke&Q=QJAR{hfAt9BH^e',
-				{
-					algorithm: 'HS256',
-					expiresIn: '1d',
-				}
-			);
-
-			return res.status(200).send({
-				success: 1,
-				message: 'Autenticado com sucesso',
-				token: token,
-			});
-		}
+		
 
 		return res.status(401).send({ success: 0, message: 'Falha na autenticação' });
 	} catch (err) {
@@ -43,31 +21,9 @@ exports.login = async (req, res) => {
 exports.register = async (req, res) => {
 	try {
 
-		let { email, password, name, status, type } = req.body;
+		let { email, password, name} = req.body;
 
-		let existingUser = await db.user.findOne({ where: { user_email: email } });
-
-		if (existingUser) {
-			return res.status(409).send({ success: 0, message: 'Utilizador já registado' });
-		}
-
-		if (email.length < 5) return res.status(406).send({ success: 0, message: 'Email inválido' });
-		if (password.length < 12) return res.status(411).send({ success: 0, message: 'A palavra-passe tem de ter 12 ou mais caracteres' });
-
-		let hashedPassword = await bcrypt.hash(password, 10);
-
-		let newUser = await db.user.create({
-			user_email: email,
-			user_password: hashedPassword,
-			user_name: name,
-			user_statusus_id: status,
-			user_typeutid: type
-		});
-
-		let response = {
-			success: 1,
-			message: 'Utilizador registado com sucesso',
-		};
+		
 
 		return res.status(201).send(response);
 	} catch (err) {
