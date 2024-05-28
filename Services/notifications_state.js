@@ -27,7 +27,6 @@ exports.getNotificationStates = async () =>{
 
 exports.getNotificationState = async (id) =>{
     try{
-        let notificationType = await db.notification_type.findByPk(id);
 
         let notificationState = await db.notification_state.findByPk(id);
 

@@ -155,20 +155,18 @@ exports.addProduct = async (req, res) => {
   try {
     let name = req.body.name;
     let price = req.body.price;
-    let quantity = req.body.quantity; //verificar quantidade, começar a 0
     let mid = req.body.museummid;
     let type = req.body.type;
-    let idOwner = req.body.idOwner;
     let idUserToken = req.user.id;
 
-    let isManager = await utils.isManager(idUserToken); //Verificar, pode ser assim mas acho que fazia sentido ver se o utilizador esta ligado ao museu em questao
+    let isManager = await utils.isManager(idUserToken); 
     let isAdmin = await utils.isAdmin(idUserToken);
 
-    if (!isManager && idOwner != idUserToken && isAdmin) {
+    if (!isManager && !isAdmin) {
       return res.status(403).send({ success: 0, message: "Sem permissão" });
     }
 
-    let user = await db.user.findByPk(idOwner);
+    let user = await db.user.findByPk(idUserToken);
     if (!user) {
       return res
         .status(404)
@@ -180,7 +178,7 @@ exports.addProduct = async (req, res) => {
     let newProduct = await db.product.create({
       product_name: name,
       product_price: price,
-      product_quantity: quantity,
+      product_quantity: 0,
       museummid: mid,
       product_typeptid: type,
     });
