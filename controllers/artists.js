@@ -1,11 +1,10 @@
-const db = require('../config/mysql');
+const db = require("../config/mysql");
 const utils = require("../utils/index");
 const services = require("../Services/artists");
-const { response } = require('express');
+const { response } = require("express");
 
 exports.getArtists = async (req, res) => {
 	try {
-		
 		let response = await services.getArtists();
 
 		return res.status(200).send(response);
@@ -29,7 +28,6 @@ exports.getArtist = async (req, res) => {
 
 exports.addArtist = async (req, res) => {
 	try {
-
 		let name = req.body.name;
 		let birthday = req.body.birthday;
 		let idUserToken = req.user.id;
@@ -51,7 +49,6 @@ exports.editArtist = async (req, res) => {
 
 		let response = await services.addArtist(idUserToken, id, name, birthday);
 
- 
 		return res.status(200).send(response);
 	} catch (err) {
 		console.error("Error editing artist:", err);
@@ -61,7 +58,6 @@ exports.editArtist = async (req, res) => {
 
 exports.removeArtist = async (req, res) => {
 	try {
-
 		let id = req.params.id;
 		let idUserToken = req.user.id;
 
