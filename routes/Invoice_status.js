@@ -4,7 +4,6 @@ const router = express.Router();
 const InvoiceStatusController = require("../controllers/Invoice_status");
 const login = require("../middleware/login");
 
-
 // list All evaluations
 router.get("/InvoiceStatus", InvoiceStatusController.getAllInvoiceStatus);
 
