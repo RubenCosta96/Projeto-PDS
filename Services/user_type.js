@@ -6,7 +6,7 @@ exports.getUsersType = async () =>{
         let type = await db.user_type.findAll();
 
         if (type.length === 0)
-            return res.status(404).send({ success: 0, message: "Não existe nenhum tipo de utilizador" });
+            throw new Error("Não existe nenhum tipo de utilizador");
 
         let response = {
             success: 1,
@@ -30,9 +30,7 @@ exports.getUserType = async (id) =>{
         let result = await db.user_type.findByPk(id);
 
         if (!result) {
-          return res
-            .status(404)
-            .send({ success: 0, message: "Tipo de utilizador inexistente" });
+            throw new Error("Tipo de utilizador inexistente");
         }
     
         let response = {    
@@ -92,9 +90,7 @@ exports.editUserType = async (idUserToken,id,description) =>{
 					let type = await db.user_type.findByPk(id);
 
                     if (!type) {
-                    return res
-                        .status(404)
-                        .send({ success: 0, message: "Tipo de utilizador inexistente" });
+                        throw new Error("Tipo de utilizador inexistente");
                     }
 
                     type.ut_description = description;
@@ -133,9 +129,7 @@ exports.removeEventType = async (idUserToken,id) =>{
                     let type = await db.user_type.findByPk(id);
 
                     if (!type) {
-                      return res
-                        .status(404)
-                        .send({ success: 0, message: "Tipo de utilizador inexistente" });
+                        throw new Error("Tipo de utilizador inexistente");
                     }
                 
                     await type.destroy();

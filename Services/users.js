@@ -300,12 +300,7 @@ exports.changePassword = async (idUserToken, oldPassword, newPassword) => {
         let user = await db.user.findByPk(idUserToken);
 
         if (newPassword.length < 12)
-            return res
-                .status(411)
-                .send({
-                    success: 0,
-                    message: "A palavra-passe tem de ter 12 ou mais caracteres",
-                });
+            throw new Error("A palavra-passe tem de ter 12 ou mais caracteres");
 
         if (bcrypt.compareSync(oldPassword, user.user_password)) {
             let hash = await bcrypt.hashSync(newPassword, 10);
@@ -321,7 +316,8 @@ exports.changePassword = async (idUserToken, oldPassword, newPassword) => {
             return response;
         }
 
-        return res.status(403).send({ message: "Palavra-passe incorreta" });
+        
+        throw new Error("Palavra-passe incorreta!");
     } catch (err) {
         throw new Error(err);
     }
