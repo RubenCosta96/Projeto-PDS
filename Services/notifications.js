@@ -29,7 +29,7 @@ exports.getUnreadNotifications = async (idUserToken) =>{
 				return {
                     id: notification.nid,
                     state: notification.notification_statensid,
-                    notificationName: notification.notification.notification_staten,
+                    notificationName: notification.notification_staten.ns_description,
 					description: notification.n_description,
                     type : notification.notification_typentid,
                     notificationType: notification.notification_typent.nt_description,
@@ -71,7 +71,7 @@ exports.getReadNotifications = async (idUserToken) =>{
 				return {
                     id: notification.nid,
                     state: notification.notification_statensid,
-                    notificationName: notification.notification.notification_staten,
+                    notificationName: notification.notification_staten.ns_description,
 					description: notification.n_description,
                     type : notification.notification_typentid,
                     notificationType: notification.notification_typent.nt_description,
@@ -113,7 +113,7 @@ exports.getAllNotifications = async (idUserToken) =>{
 				return {
                     id: notification.nid,
                     state: notification.notification_statensid,
-                    notificationName: notification.notification.notification_staten,
+                    notificationName: notification.notification_staten.ns_description,
 					description: notification.n_description,
                     type : notification.notification_typentid,
                     notificationType: notification.notification_typent.nt_description,
