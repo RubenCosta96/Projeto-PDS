@@ -58,8 +58,9 @@ exports.editAd = async (req, res) => {
 exports.removeAd = async (req, res) => {
   try {
     let id = req.params.id;
+    let idUserToken = req.user.id;
 
-    let response = await services.adRemove(id);
+    let response = await services.adRemove(id, idUserToken);
 
     return res.status(200).send(response);
   } catch (err) {

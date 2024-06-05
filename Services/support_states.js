@@ -30,9 +30,7 @@ exports.getSupportState = async (id) => {
         let state = await db.support_state.findByPk(id);
 
         if (!state)
-            return res
-                .status(404)
-                .send({ success: 0, message: "Estado inexistente" });
+            throw new Error("Estado inexistente");
 
         let response = {
             success: 1,

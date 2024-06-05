@@ -85,13 +85,14 @@ exports.getEventByMuseum = async (id) => {
 
 exports.editEvent = async (id, idUserToken, start_date, end_date, type,status, price) => {
 	try {
-		let event = await db.event.findByPk(id);
 
 		switch (user) {
 			case 1: //Admin
 				throw new Error("Sem permissao!");
 			case 2: //Manager
 				try {
+					let event = await db.event.findByPk(id);
+
 					if (!event) {
 						throw new Error("Evento inexistente!");
 					}
@@ -214,7 +215,7 @@ exports.addEvent = async (idUserToken, start_date, end_date, type, museum, statu
 	}
 };
 
-exports.editPriceEvent = async (idUserToken, EventId, price) => {
+exports.editPriceEvent = async (idUserToken, eventId, price) => {
 	try{
 		let user = await utils.userType(idUserToken);
 

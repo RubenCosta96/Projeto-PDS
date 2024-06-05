@@ -6,9 +6,7 @@ exports.getAllTicketStatus = async () => {
         let status = await db.ticket_status.findAll();
 
         if (status.length === 0)
-            return res
-                .status(404)
-                .send({ success: 0, message: "Não existem status de tickets" });
+            throw new Error("Não existem status de ticket");
 
         let response = {
             success: 1,
@@ -32,9 +30,7 @@ exports.getTicketStatus = async (id) => {
         let status = await db.ticket_status.findByPk(id);
 
         if (!status)
-            return res
-                .status(404)
-                .send({ success: 0, message: "Status inexistente" });
+            throw new Error("Status inexistente");
 
         let response = {
             success: 1,
@@ -96,7 +92,7 @@ exports.removeTicketStatus = async (idUserToken, id) => {
                     const status = await db.ticket_status.findByPk(id);
 
                     if (!status) {
-                        return { success: 0, message: "Status inexistente" };
+                        throw new Error("Status inexistente");
                     }
                     await status.destroy();
                 } catch (err) {

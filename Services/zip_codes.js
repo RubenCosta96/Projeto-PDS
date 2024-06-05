@@ -6,7 +6,7 @@ exports.getAllZipCodes = async () => {
         let result = await db.zip_code.findAll();
 
         if (result.length === 0) {
-            return { success: 0, message: "Não existem codigos postais" };
+            throw new Error("Nao existem codigos de postais");
         }
 
         let response = {
@@ -30,7 +30,7 @@ exports.getZipCode = async (code) => {
         let result = await db.zip_code.findByPk(code);
 
         if (!result) {
-            return { success: 0, message: "Codigo postal inexistente" };
+            throw new Error("Codigo postal inexistente");
         }
 
         let response = {
@@ -97,7 +97,7 @@ exports.removeZipCode = async (idUserToken, code) => {
                     const zip = await db.zip_code.findByPk(code);
 
                     if (!zip) {
-                        return { success: 0, message: "Registo inexistente" };
+                        throw new Error("Codigo postal inexistente");
                     }
                     await zip.destroy();
                 } catch (err) {

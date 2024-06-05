@@ -63,7 +63,7 @@ exports.addCollection = async (idUserToken,name) =>{
                 break;
 			case 2: //Manager
                 throw new Error("Sem permissao!");
-			case 3: //User, nao tem acesso a esta funçao
+			case 3: //User
                 throw new Error("Sem permissao!");
 			default:
 				throw new Error("Utilizador nao reconhecido!");

@@ -139,12 +139,7 @@ exports.getUsers = async (idUserToken) => {
                     let users = await db.user.findAll();
 
                     if (users.length === 0)
-                        return res
-                            .status(404)
-                            .send({
-                                success: 0,
-                                message: "Não existem utilizadores",
-                            });
+                        throw new Error("Não existem utilizadores");
 
                     let response = {
                         success: 1,
@@ -185,12 +180,7 @@ exports.getUser = async (idUserToken, id) => {
                 try {
                     let user = await db.user.findByPk(id);
                     if (!user)
-                        return res
-                            .status(404)
-                            .send({
-                                success: 0,
-                                message: "Utilizador inexistente",
-                            });
+                        throw new Error("Utilizador inexistente");
 
                     let response = {
                         success: 1,
@@ -231,12 +221,7 @@ exports.removeUser = async (idUserToken, id) => {
                 try {
                     let user = await db.user.findByPk(id);
                     if (!user)
-                        return res
-                            .status(404)
-                            .send({
-                                success: 0,
-                                message: "Utilizador inexistente",
-                            });
+                        throw new Error("Utilizador inexistente");
 
                     await user.destroy();
                 } catch (err) {
@@ -266,18 +251,14 @@ exports.tokenVerify = async (token) => {
         try {
             var decode = jwt.verify(token, "#^NJW5SKJ$Oke&Q=QJAR{hfAt9BH^e");
         } catch (err) {
-            return res
-                .status(401)
-                .send({ success: 0, error: err, message: err.message });
+            throw new Error(err.message);
         }
 
         let id = decode.id;
 
         let user = await db.user.findByPk(id);
         if (!user)
-            return res
-                .status(404)
-                .send({ success: 0, message: "Utilizador inexistente" });
+            throw new Error("Utilizador inexistente");
 
         let response = {
             success: 1,
@@ -332,12 +313,7 @@ exports.suspendActivity = async (idUserToken, id) => {
                 try {
                     let user = await db.user.findByPk(id);
                     if (!user)
-                        return res
-                            .status(404)
-                            .send({
-                                success: 0,
-                                message: "Utilizador inexistente",
-                            });
+                        throw new Error("Utilizador inexistente");
 
                     user.user_statusus_id = 2;
                     await user.save();
@@ -372,12 +348,7 @@ exports.changeUserType = async (idUserToken, id, type) => {
                 try {
                     let user = await db.user.findByPk(id);
                     if (!user)
-                        return res
-                            .status(404)
-                            .send({
-                                success: 0,
-                                message: "Utilizador inexistente",
-                            });
+                        throw new Error("Utilizador inexistente");
 
                     user.user_typeutid = type;
                     await user.save();

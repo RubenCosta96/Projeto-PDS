@@ -92,9 +92,7 @@ exports.getEvaluation = async (id) =>{
         let result = await db.product_evaluation.findByPk(id);
 
         if (!result) {
-        return res
-            .status(404)
-            .send({ success: 0, message: "Avaliaçao inexistente" });
+            throw new Error("Avaliação inexistente");
         }
 
         let response = {    
@@ -144,9 +142,7 @@ exports.editEvaluation = async (idUserToken,description, evaluation,prodId) =>{
         });
     
         if (!evaluations) {
-          return res
-            .status(404)
-            .send({ success: 0, message: "Avaliação inexistente" });
+            throw new Error("Avaliação inexistente");
         }
     
     
@@ -182,9 +178,7 @@ exports.removeEvaluation = async (idUserToken, prodId, userId) =>{
                     });
                 
                     if (!evaluation) {
-                      return res
-                        .status(404)
-                        .send({ success: 0, message: "Avaliação inexistente" });
+                        throw new Error("Avaliação inexistente");
                     }
                 
                     await evaluation.destroy();
@@ -204,9 +198,7 @@ exports.removeEvaluation = async (idUserToken, prodId, userId) =>{
                 });
             
                 if (!evaluation) {
-                  return res
-                    .status(404)
-                    .send({ success: 0, message: "Avaliação inexistente" });
+                    throw new Error("Avaliação inexistente");
                 }
             
                 await evaluation.destroy();

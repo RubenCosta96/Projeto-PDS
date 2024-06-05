@@ -76,7 +76,7 @@ exports.addInvoiceStatus = async (description, idUserToken) => {
 
 exports.editInvoiceStatus = async (id, idUserToken, description) => {
 	try {
-		let status = await db.Invoice_status.findByPk(id);
+		let status = await db.invoice_status.findByPk(id);
 
 		if (!status) throw new Error("Estado de faturação inexistente");
 

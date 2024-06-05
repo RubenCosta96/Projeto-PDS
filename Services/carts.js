@@ -100,7 +100,7 @@ exports.getCart = async (userId, prodId) => {
 			},
 		});
 
-		if (!result) throw new Error("Esta entrada não inexistente");
+		if (!result) throw new Error("Entrada nao inexistente");
 
 		let response = {
 			success: 1,

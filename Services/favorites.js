@@ -6,9 +6,7 @@ exports.getFavorites = async () => {
         let favorites = await db.favorites.findAll();
 
         if (favorites.length === 0) {
-            return res
-                .status(404)
-                .send({ success: 0, message: "Não existem favoritos" });
+            throw new Error("Não existem favoritos");
         }
 
         let response = {
@@ -30,12 +28,10 @@ exports.getFavorites = async () => {
 
 exports.getFavoriteById = async (id) => {
     try {
-        let result = await db.favorites.findByPk(id);
+        let favorite = await db.favorites.findByPk(id);
 
         if (!favorite) {
-            return res
-                .status(404)
-                .send({ success: 0, message: "Categoria de peça inexistente" });
+            throw new Error("Favorito inexistente");
         }
 
         let response = {
@@ -57,7 +53,7 @@ exports.getFavoriteById = async (id) => {
 
 exports.addFavorite = async (idUserToken, product_id) => {
     try {
-        let user = await utils.UserType(idUserToken);
+        let user = await utils.userType(idUserToken);
 
         switch (user) {
             case 1: //Admin

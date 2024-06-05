@@ -30,8 +30,9 @@ exports.getEventEval = async (req, res) => {
 exports.addEventsEval = async (req, res) => {
 	try {
 		let { description, evaluation, user_id } = req.body;
+		let event = req.params.id;
 
-		let response = await services.addEventsEval(description, evaluation, user_id);
+		let response = await services.addEventsEval(event,description, evaluation, user_id);
 
 		return res.status(200).send(response);
 	} catch (err) {

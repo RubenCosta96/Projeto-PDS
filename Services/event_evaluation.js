@@ -60,8 +60,20 @@ exports.getEventEval = async (id) => {
 	}
 };
 
-exports.addEventsEval = async (description, evaluation, user_id) => {
+exports.addEventsEval = async (event, description, evaluation, idUserToken) => {
 	try {
+		let ticket = await db.ticket.findOne({
+			where:{
+				useruid: idUserToken,
+				eventeid: event,
+		}});
+
+		if(!ticket) throw new Error("Ticket inexistente");
+
+		if(!event) throw new Error("Evento inexistente");
+
+		if(ticket.ticket_statusts_id != 2) throw new Error("Não participou neste evento");
+
 		let newEventEval = await db.event_evaluation.create({
 			ee_description: description,
 			ee_evaluation: evaluation,
@@ -81,15 +93,14 @@ exports.addEventsEval = async (description, evaluation, user_id) => {
 
 exports.editEventsEval = async (id, idUserToken, description, evaluation, user_id) => {
 	try {
-		let event_evaluation = await db.event_evaluation.findByPk(id);
+		let event_evaluation = await db.event_evaluation.findOne({
+			where:{
+				eventeid: id,
+				useruid: idUserToken,
+		}});
 
 		if (!event_evaluation) {
 			throw new Error("Avaliação de evento inexistente");
-		}
-
-		let user = await db.user.findByPk(idUserToken);
-		if (!user) {
-			throw new Error("Utilizador inexistente");
 		}
 
 		event_evaluation.eventeeid = id;

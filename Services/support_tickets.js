@@ -103,7 +103,16 @@ exports.getSupportTicket = async(idUserToken, idTicket) => {
                     where:{
                         stid: idTicket,
                         support_statesssid: 5,      //Verificar se esta de acordo com a bd
-                    }
+                    },
+                    include: [{
+                        model: db.museum,
+                        as: 'museumm',
+                        attributes: ['museum_name']
+                    },{
+                        model: db.user,
+                        as: 'useru',
+                        attributes: ['user_name']
+                    },]
                 });
             }catch(err){
                 throw new Error(err);
@@ -120,7 +129,16 @@ exports.getSupportTicket = async(idUserToken, idTicket) => {
                     where:{
                         stid: idTicket,
                         museummid: museum.museummid,
-                    }
+                    },
+                    include: [{
+                        model: db.museum,
+                        as: 'museumm',
+                        attributes: ['museum_name']
+                    },{
+                        model: db.user,
+                        as: 'useru',
+                        attributes: ['user_name']
+                    },]
                 });
             }catch(err){
                 throw new Error(err);
@@ -132,7 +150,15 @@ exports.getSupportTicket = async(idUserToken, idTicket) => {
                     where:{
                         stid: idTicket,
                         useruid: idUserToken,
-                    }
+                    },include: [{
+                        model: db.museum,
+                        as: 'museumm',
+                        attributes: ['museum_name']
+                    },{
+                        model: db.user,
+                        as: 'useru',
+                        attributes: ['user_name']
+                    },]
                 });
             }catch(err){
                 throw new Error(err);
@@ -150,14 +176,15 @@ exports.getSupportTicket = async(idUserToken, idTicket) => {
             length: 1,
             results: [
                 {
-                    id: result.stid,
-                    description: result.Description,
-                    statessid: result.support_statesssid,
-                    museumid: result.museummid,
-                    userid: result.useruid,
-                    priority: result.priority,
-                    responsible: result.admin_useruid,
-                    deadline: result.deadline,
+                    id: support_ticket.stid,
+                    description: support_ticket.Description,
+                    statessid: support_ticket.support_statesssid,
+                    museumid: support_ticket.museummid,
+                    museumName: support_ticket.museumm.museum_name, // Nome do museu
+                    userid: support_ticket.useruid,
+                    username: support_ticket.useru.user_name,   //user name
+                    priority: support_ticket.priority,
+                    deadline: support_ticket.deadline,
                 },
             ],
         };
@@ -338,7 +365,7 @@ exports.SupportTicketSolved = async (id, description,type,idUserToken) => {
 		let user = await utils.userType(idUserToken);
     
         switch(user){
-            case 1:     //Admin, nao tem acesso a esta funçao 
+            case 1:
             try{
                 let ticket = await db.support_ticket.findByPk(id);
 

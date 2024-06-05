@@ -30,9 +30,7 @@ exports.getUserStatus = async (id) =>{
         let result = await db.user_status.findByPk(id);
 
         if (!result) {
-        return res
-            .status(404)
-            .send({ success: 0, message: "Estado inexistente" });
+            throw new Error("Estado inexistente");
         }
 
         let response = {    
@@ -92,9 +90,7 @@ exports.editUserStatus = async (idUserToken,id,description) =>{
                     let status = await db.user_status.findByPk(id);
 
                     if (!status) {
-                      return res
-                        .status(404)
-                        .send({ success: 0, message: "Estado inexistente" });
+                        throw new Error("Estado inexistente");
                     }
                 
                 
@@ -134,9 +130,7 @@ exports.removeEventStatus = async (idUserToken,id) =>{
                     let status = await db.user_status.findByPk(id);
 
                     if (!status) {
-                    return res
-                        .status(404)
-                        .send({ success: 0, message: "Estado inexistente" });
+                        throw new Error("Estado inexistente");
                     }
 
 

@@ -132,19 +132,19 @@ exports.confirmReception = async (id, propId) => {
 	}
 };
 
-exports.editAd = async (userId,pieceId, description) => {
+exports.editAd = async (idUserToken,pieceId, description) => {
     try{
         let ad = await db.ad.findByPk(id);
-
-        if(ad.useruid != idUserToken){
-            throw new Error("Sem permissão");
-        }
 
         if (!ad) {
             throw new Error("Anúncio inexistente");
         }
 
-        if (userId) ad.useruid = userId;
+        if(ad.useruid != idUserToken){
+            throw new Error("Sem permissão");
+        }
+
+        if (idUserToken) ad.useruid = idUserToken;
         if (pieceId) ad.piecepid = pieceId;
         if (description) ad.description = description;
 
@@ -161,12 +161,16 @@ exports.editAd = async (userId,pieceId, description) => {
 	}
 };
 
-exports.adRemove = async (id) => {
+exports.adRemove = async (id, idUserToken) => {
     try{
         let ad = await db.ad.findByPk(id);
 
         if (!ad) {
             throw new Error("Anúncio inexistente");
+        }
+
+        if(ad.useruid != idUserToken){
+            throw new Error("Sem permissão");
         }
 
         await ad.destroy();
