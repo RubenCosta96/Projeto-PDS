@@ -1,6 +1,8 @@
 const { where } = require("sequelize");
 const db = require("../config/mysql");
 const utils = require("../utils/index");
+const service = require("./products");
+
 
 exports.getAllSales = async () => {
 	try {
@@ -111,7 +113,7 @@ exports.getSale = async (id) => {
 	}
 };
 
-exports.addSale = async (date, userid, invoiceStatus, idUserToken) => {
+exports.addSale = async (date, userid, idUserToken) => {
 	try {
 		let newSaleInvoice;
 		let user = await utils.userType(idUserToken);
@@ -121,7 +123,7 @@ exports.addSale = async (date, userid, invoiceStatus, idUserToken) => {
 				newSaleInvoice = await db.sale_invoice.create({
 					invoice_departure_date: date,
 					useruid: userid,
-					Invoice_statusinvoicestatusid: invoiceStatus,
+					Invoice_statusinvoicestatusid: 1,
 				});
 
 				break;
@@ -129,7 +131,7 @@ exports.addSale = async (date, userid, invoiceStatus, idUserToken) => {
 				newSaleInvoice = await db.sale_invoice.create({
 					invoice_departure_date: date,
 					useruid: userid,
-					Invoice_statusinvoicestatusid: invoiceStatus,
+					Invoice_statusinvoicestatusid: 1,
 				});
 
 				break;
@@ -215,6 +217,68 @@ exports.removeSale = async (id, idUserToken) => {
 		let response = {
 			success: 1,
 			message: "Registo de venda removido com sucesso",
+		};
+
+		return response;
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+exports.emiteSale = async (idUserToken, saleId) => {
+	try {
+		let user = await utils.userType(idUserToken);
+		let sale;
+		let lines;
+
+		switch (user) {
+			case 1: //Admin
+				sale = await db.sale_invoice.findByPk(saleId);
+
+				if (!sale) throw new Error("Compra nao encontrada!");
+
+				lines = await db.sale_line.findAll({
+					where: {
+						sale_invoicesale_invoiceid: sale.sale_invoiceid,
+					},
+				});
+
+				for (let line of lines) {
+					await service.removeProductQuantity(idUserToken, line.productprodid, line.purline_quantity);
+				}
+
+				sale.Invoice_statusinvoicestatusid = 2;
+
+				sale.save();
+				break;
+			case 2: //Manager
+				sale = await db.sale_invoice.findByPk(saleId);
+
+				if (!sale) throw new Error("Compra nao encontrada!");
+
+				lines = await db.sale_line.findAll({
+					where: {
+						sale_invoicesale_invoiceid: sale.sale_invoiceid,
+					},
+				});
+
+				for (let line of lines) {
+					await service.removeProductQuantity(idUserToken, line.productprodid, line.purline_quantity);
+				}
+
+				sale.Invoice_statusinvoicestatusid = 2;
+
+				sale.save();
+				break;
+			case 3: //User, nao tem acesso a esta funçao
+				throw new Error("Sem permissao!");
+			default:
+				throw new Error("Utilizador nao reconhecido!");
+		}
+
+		let response = {
+			success: 1,
+			message: "Compra emitida com sucesso!",
 		};
 
 		return response;

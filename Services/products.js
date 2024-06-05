@@ -245,3 +245,129 @@ exports.removeProduct = async (id, idUserToken) => {
 		throw new Error(err);
 	}
 };
+
+
+exports.addProductQuantity = async (idUserToken, idProduct, quantity) => {
+	try {
+		let user = await utils.userType(idUserToken);
+		let product;
+
+		switch (user) {
+			case 1: //Admin
+				product = await db.product.findByPk(idProduct);
+
+				if (!product) throw new Error("Produto nao encontrada!");
+
+				product.product_quantity += quantity;
+
+				await product.save();
+				break;
+			case 2: //Manager
+				product = await db.product.findByPk(idProduct);
+
+				if (!product) throw new Error("Produto nao encontrada!");
+
+				product.product_quantity += quantity;
+
+				await product.save();
+				break;
+			case 3: //User, nao tem acesso a esta funçao
+				throw new Error("Sem permissao!");
+			default:
+				throw new Error("Utilizador nao reconhecido!");
+		}
+
+		let response = {
+			success: 1,
+			message: "Quantidade do produto atualizada com sucesso!",
+		};
+
+		return response;
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+exports.removeProductQuantity = async (idUserToken, idProduct, quantity) => {
+	try {
+		let user = await utils.userType(idUserToken);
+		let product;
+
+		switch (user) {
+			case 1: //Admin
+				product = await db.product.findByPk(idProduct);
+
+				if (!product) throw new Error("Produto nao encontrada!");
+
+				product.product_quantity -= quantity;
+
+				await product.save();
+				break;
+			case 2: //Manager
+				product = await db.product.findByPk(idProduct);
+
+				if (!product) throw new Error("Produto nao encontrada!");
+
+				product.product_quantity -= quantity;
+
+				await product.save();
+				break;
+			case 3: //User, nao tem acesso a esta funçao
+				throw new Error("Sem permissao!");
+			default:
+				throw new Error("Utilizador nao reconhecido!");
+		}
+
+		let response = {
+			success: 1,
+			message: "Quantidade do produto atualizada com sucesso!",
+		};
+
+		return response;
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+exports.verifyProductQuantity = async (idUserToken, idProduct, quantity) => {
+	try {
+		let user = await utils.userType(idUserToken);
+		let product;
+		let response = false;
+
+		switch (user) {
+			case 1: //Admin
+				product = await db.product.findByPk(idProduct);
+
+				if (!product) throw new Error("Produto nao encontrada!");
+
+				if(product.product_quantity < quantity){
+					response = false;
+				}else{
+					console.log("else")
+					response = true;
+				}
+
+				break;
+			case 2: //Manager
+				product = await db.product.findByPk(idProduct);
+
+				if (!product) throw new Error("Produto nao encontrada!");
+
+				if(product.product_quantity < quantity){
+					response = false;
+				}else{
+					response = true;
+				}
+				break;
+			case 3: //User, nao tem acesso a esta funçao
+				throw new Error("Sem permissao!");
+			default:
+				throw new Error("Utilizador nao reconhecido!");
+		}
+
+		return response;
+	} catch (err) {
+		throw new Error(err);
+	}
+};

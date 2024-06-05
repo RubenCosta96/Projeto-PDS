@@ -53,10 +53,9 @@ exports.addSale = async (req, res) => {
 	try {
 		let date = req.body.date;
 		let userid = req.body.user_id;
-		let invoiceStatus = req.body.invoice_status;
 		let idUserToken = req.user.id;
 
-		let response = await services.addSale(date, userid, invoiceStatus, idUserToken);
+		let response = await services.addSale(date, userid, idUserToken);
 
 		return res.status(200).send(response);
 	} catch (err) {
@@ -84,6 +83,19 @@ exports.removeSale = async (req, res) => {
 		let idUserToken = req.user.id;
 
 		let response = await services.removeSale(id, idUserToken);
+
+		return res.status(200).send(response);
+	} catch (err) {
+		return res.status(500).send({ error: err, message: err.message });
+	}
+};
+
+exports.emiteSale = async (req, res) => {
+	try {
+		let id = req.params.id;
+		let idUserToken = req.user.id;
+
+		let response = await services.emiteSale(idUserToken, id);
 
 		return res.status(200).send(response);
 	} catch (err) {

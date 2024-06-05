@@ -1,6 +1,7 @@
 const { where } = require("sequelize");
 const db = require("../config/mysql");
 const utils = require("../utils/index");
+const service = require("./products");
 
 exports.getAllSaleLines = async () => {
 	try {
@@ -85,18 +86,26 @@ exports.addSaleLine = async (quantity, saleId, prodId, idUserToken) => {
 
 		switch (user) {
 			case 1: //Admin
-				newSaleLine = await db.sale_line.create({
-					line_quantity: quantity,
-					sale_invoicesale_invoiceid: saleId,
-					productprodid: prodId,
-				});
+				if(await service.verifyProductQuantity(idUserToken, prodId, quantity)){
+					newSaleLine = await db.sale_line.create({
+						line_quantity: quantity,
+						sale_invoicesale_invoiceid: saleId,
+						productprodid: prodId,
+					});
+				}else{
+					throw new Error("Quantidade Indisponivel!");
+				}
 				break;
 			case 2: //Manager
-				newSaleLine = await db.sale_line.create({
-					line_quantity: quantity,
-					sale_invoicesale_invoiceid: saleId,
-					productprodid: prodId,
+				if(await service.verifyProductQuantity(idUserToken, prodId, quantity)){
+					newSaleLine = await db.sale_line.create({
+						line_quantity: quantity,
+						sale_invoicesale_invoiceid: saleId,
+						productprodid: prodId,
 				});
+				}else{
+					throw new Error("Quantidade Indisponivel!");
+				}
 				break;
 			case 3: //User, nao tem acesso a esta funçao
 				throw new Error("Sem permissao!");
