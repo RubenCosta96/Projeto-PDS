@@ -3,7 +3,20 @@ const utils = require("../utils/index");
 
 exports.getUnreadNotifications = async (idUserToken) =>{
     try{
-        let notifications = await db.notification.findAll({ where: { useruid: idUserToken, notification_statensid: 1 }});
+        let notifications = await db.notification.findAll({ 
+            where: { 
+                useruid: idUserToken, 
+                notification_statensid: 1,
+            },include: [{
+                model: db.notification_state,
+                as: 'notification_staten',
+                attributes: ['ns_description']
+            },{
+                model: db.notification_type,
+                as: 'notification_typent',
+                attributes: ['nt_description']
+            },]
+        });
 
         if (notifications.lenght === 0) {
             throw new Error("Não existem notificações por ler!");
@@ -14,10 +27,12 @@ exports.getUnreadNotifications = async (idUserToken) =>{
 			length: notifications.length,
 			results: notifications.map((notification) => {
 				return {
-                    type: notification.notification_typentid,
-					id: notification.nid,
+                    id: notification.nid,
+                    state: notification.notification_statensid,
+                    notificationName: notification.notification.notification_staten,
 					description: notification.n_description,
-                    state : notification.notification_statensid
+                    type : notification.notification_typentid,
+                    notificationType: notification.notification_typent.nt_description,
 				};
 			}),
 		};
@@ -30,7 +45,20 @@ exports.getUnreadNotifications = async (idUserToken) =>{
 
 exports.getReadNotifications = async (idUserToken) =>{
     try{
-        let notifications = await db.notification.findAll({ where: { useruid: idUserToken, notification_statensid: 2 }});
+        let notifications = await db.notification.findAll({ 
+            where: { 
+                useruid: idUserToken, 
+                notification_statensid: 2 
+            },include: [{
+                model: db.notification_state,
+                as: 'notification_staten',
+                attributes: ['ns_description']
+            },{
+                model: db.notification_type,
+                as: 'notification_typent',
+                attributes: ['nt_description']
+            },]
+        });
 
         if (notifications.length === 0) {
             throw new Error("Não existem notificações!");
@@ -41,10 +69,12 @@ exports.getReadNotifications = async (idUserToken) =>{
 			length: notifications.length,
 			results: notifications.map((notification) => {
 				return {
-                    type: notification.notification_typentid,
-					id: notification.nid,
+                    id: notification.nid,
+                    state: notification.notification_statensid,
+                    notificationName: notification.notification.notification_staten,
 					description: notification.n_description,
-                    state : notification.notification_statensid
+                    type : notification.notification_typentid,
+                    notificationType: notification.notification_typent.nt_description,
 				};
 			}),
 		};
@@ -58,7 +88,19 @@ exports.getReadNotifications = async (idUserToken) =>{
 exports.getAllNotifications = async (idUserToken) =>{
     try{
 
-        let notifications = await db.notification.findAll({ where: { useruid: idUserToken }});
+        let notifications = await db.notification.findAll({ 
+            where: { 
+                useruid: idUserToken 
+            },include: [{
+                model: db.notification_state,
+                as: 'notification_staten',
+                attributes: ['ns_description']
+            },{
+                model: db.notification_type,
+                as: 'notification_typent',
+                attributes: ['nt_description']
+            },]
+        });
 
         if (notifications.lenght === 0) {
             throw new Error("Não existem notificações!");
@@ -69,10 +111,12 @@ exports.getAllNotifications = async (idUserToken) =>{
 			length: notifications.length,
 			results: notifications.map((notification) => {
 				return {
-                    type: notification.notification_typentid,
-					id: notification.nid,
+                    id: notification.nid,
+                    state: notification.notification_statensid,
+                    notificationName: notification.notification.notification_staten,
 					description: notification.n_description,
-                    state : notification.notification_statensid
+                    type : notification.notification_typentid,
+                    notificationType: notification.notification_typent.nt_description,
 				};
 			}),
 		};
